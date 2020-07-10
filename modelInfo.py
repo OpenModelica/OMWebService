@@ -451,7 +451,7 @@ def getStrings(value, start='{', end='}'):
         inString = True
       elif value[i] == ',':
         if ele == 0:
-          lst.append(value[begin:i+1].strip())
+          lst.append(value[begin:i].strip())
           begin = i+1
       elif value[i] == start:
         ele+=1
@@ -464,30 +464,28 @@ def getStrings(value, start='{', end='}'):
 def getElements(modelicaClass):
   elements = []
   components = ask_omc('getComponents', modelicaClass + ', useQuotes = true', parsed=False)
-
   componentsList = unparseArrays(components)
-  #print(componentsList)
-  for i in range(len(componentsList)):
-    try:
-      element = dict()
-      componentInfo = unparseStrings(componentsList[i])
-      componentAnnotation = ask_omc('getNthComponentAnnotation', modelicaClass + ', ' + str(i+1), parsed=False)
-      #componentAnnotationList = getStrings(removeFirstLastCurlBrackets(componentAnnotation))
-      #print(ask_omc('getNthComponentAnnotation', modelicaClass + ', ' + str(i+1), parsed=False))
-      #Use getComponentAnnotations outside of this loop instead of getNthComponentAnnotation
-      element['info'] = componentInfo
-      element['annotation'] = removeFirstLastCurlBrackets(componentAnnotation).strip()
-      elements.append(element)
-    except KeyError as ex:
-      logger.error('KeyError: {0} index: {1} {2}'.format(modelicaClass, i+1, str(ex)))
-      continue
+  if componentsList:
+    componentAnnotations = ask_omc('getComponentAnnotations', modelicaClass, parsed=False)
+    componentAnnotationsList = getStrings(removeFirstLastCurlBrackets(componentAnnotations))
+
+    for i in range(len(componentsList)):
+      try:
+        element = dict()
+        componentInfo = unparseStrings(componentsList[i])
+        element['info'] = componentInfo
+        element['annotation'] = componentAnnotationsList[i]
+        elements.append(element)
+      except KeyError as ex:
+        logger.error('KeyError: {0} index: {1} {2}'.format(modelicaClass, i+1, str(ex)))
+        continue
 
   return elements
 
 def getConnections(modelicaClass):
   return []
 
-def getBaseClasses(modelicaClass):
+def getInheritedClasses(modelicaClass):
   inheritedClasses = ask_omc('getInheritedClasses', modelicaClass)['SET1']
   if not inheritedClasses:
     return []
@@ -506,7 +504,7 @@ def exportJson(modelicaClass):
   classJson['diagram'] = getAnnotation(modelicaClass, ViewType.diagram)
   classJson['elements'] = getElements(modelicaClass)
   classJson['connections'] = getConnections(modelicaClass)
-  classJson['extends'] = getBaseClasses(modelicaClass)
+  classJson['extends'] = getInheritedClasses(modelicaClass)
 
   with open(os.path.join(output_dir, classToFileName(modelicaClass) + '.json'), 'w') as f_p:
     json.dump(classJson, f_p, indent=2)
