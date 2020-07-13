@@ -21,7 +21,7 @@
     false,
     ""
   ],
-  "elements": [
+  "connectors": [
     {
       "info": [
         "Modelica.Electrical.Analog.Interfaces.Pin",
@@ -40,6 +40,6 @@
       "annotation": "{Placement(true,0.0,100.0,10.0,-10.0,-10.0,10.0,270.0,-,-,-,-,-,-,)}"
     }
   ],
-  "connections": [],
-  "extends": []
+  "parameters": [],
+  "connections": []
 }

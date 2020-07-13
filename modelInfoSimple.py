@@ -461,8 +461,7 @@ def getStrings(value, start='{', end='}'):
   lst.append(value[begin:len(value) + 1].strip())
   return lst
 
-def getElements(modelicaClass):
-  elements = []
+def getElements(modelicaClass, parameters, connectors):
   components = ask_omc('getComponents', modelicaClass + ', useQuotes = true', parsed=False)
   componentsList = unparseArrays(components)
   if componentsList:
@@ -471,16 +470,26 @@ def getElements(modelicaClass):
 
     for i in range(len(componentsList)):
       try:
-        element = dict()
         componentInfo = unparseStrings(componentsList[i])
-        element['info'] = componentInfo
-        element['annotation'] = componentAnnotationsList[i]
-        elements.append(element)
+        if ask_omc('isConnector', componentInfo[0]):
+          element = dict()
+          element['info'] = componentInfo
+          element['annotation'] = componentAnnotationsList[i]
+          connectors.append(element)
+        elif (componentInfo[8] == 'parameter'):
+          element = dict()
+          element['info'] = componentInfo
+          element['annotation'] = componentAnnotationsList[i]
+          parameters.append(element)
       except KeyError as ex:
         logger.error('KeyError: {0} index: {1} {2}'.format(modelicaClass, i+1, str(ex)))
         continue
 
-  return elements
+  inheritedClassesJsonList = []
+  inheritedClasses = getInheritedClasses(modelicaClass)
+  for inheritedClass in inheritedClasses:
+    if inheritedClass:
+      getElements(inheritedClass, parameters, connectors)
 
 def getConnections(modelicaClass):
   return []
@@ -496,19 +505,16 @@ def exportJson(modelicaClass, topLevel = False):
 
   classJson['className'] = modelicaClass
   if topLevel:
-    classJson['svgPath'] = "svg/" + modelicaClass + ".svg"
+    classJson['svgPath'] = "svg/" + classToFileName(modelicaClass) + ".svg"
   classJson['info'] = classInfo
   #classJson['icon'] = getAnnotation(modelicaClass, ViewType.icon)
   #classJson['diagram'] = getAnnotation(modelicaClass, ViewType.diagram)
-  classJson['elements'] = getElements(modelicaClass)
+  parameters = []
+  connectors = []
+  getElements(modelicaClass, parameters, connectors)
+  classJson['connectors'] = connectors
+  classJson['parameters'] = parameters
   classJson['connections'] = getConnections(modelicaClass)
-  inheritedClassesJsonList = []
-  inheritedClasses = getInheritedClasses(modelicaClass)
-  for inheritedClass in inheritedClasses:
-    if inheritedClass:
-      inheritedClassesJsonList.append(exportJson(inheritedClass))
-
-  classJson['extends'] = inheritedClassesJsonList
 
   return classJson
 
