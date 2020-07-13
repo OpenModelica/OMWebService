@@ -486,28 +486,31 @@ def getConnections(modelicaClass):
   return []
 
 def getInheritedClasses(modelicaClass):
-  inheritedClasses = ask_omc('getInheritedClasses', modelicaClass)['SET1']
-  if not inheritedClasses:
-    return []
-  else:
-    return inheritedClasses['Set1']
+  return getStrings(removeFirstLastCurlBrackets(ask_omc('getInheritedClasses', modelicaClass, parsed=False)))
 
-def exportJson(modelicaClass):
+def exportJson(modelicaClass, topLevel = False):
   classJson = dict()
 
   classInfo  = omc.sendExpression('getClassInformation({0})'.format(modelicaClass))
   baseDir = os.path.dirname(classInfo[5])
 
   classJson['className'] = modelicaClass
+  if topLevel:
+    classJson['svgPath'] = "svg/" + modelicaClass + ".svg"
   classJson['info'] = classInfo
-  classJson['icon'] = getAnnotation(modelicaClass, ViewType.icon)
-  classJson['diagram'] = getAnnotation(modelicaClass, ViewType.diagram)
+  #classJson['icon'] = getAnnotation(modelicaClass, ViewType.icon)
+  #classJson['diagram'] = getAnnotation(modelicaClass, ViewType.diagram)
   classJson['elements'] = getElements(modelicaClass)
   classJson['connections'] = getConnections(modelicaClass)
-  classJson['extends'] = getInheritedClasses(modelicaClass)
+  inheritedClassesJsonList = []
+  inheritedClasses = getInheritedClasses(modelicaClass)
+  for inheritedClass in inheritedClasses:
+    if inheritedClass:
+      inheritedClassesJsonList.append(exportJson(inheritedClass))
 
-  with open(os.path.join(output_dir, classToFileName(modelicaClass) + '.json'), 'w') as f_p:
-    json.dump(classJson, f_p, indent=2)
+  classJson['extends'] = inheritedClassesJsonList
+
+  return classJson
 
 def main():
   global baseDir
@@ -566,7 +569,11 @@ def main():
     logger.addHandler(fh)
 
     logger.info('Exporting: ' + className)
-    exportJson(className)
+
+    classJson = exportJson(className, True)
+    with open(os.path.join(output_dir, classToFileName(className) + '.json'), 'w') as f_p:
+      json.dump(classJson, f_p, indent=2)
+
     logger.info('Done: ' + className)
     # except:
     #     print 'FAILED: ' + className

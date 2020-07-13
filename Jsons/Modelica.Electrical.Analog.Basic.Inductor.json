@@ -1,0 +1,169 @@
+{
+  "className": "Modelica.Electrical.Analog.Basic.Inductor",
+  "svgPath": "svg/Modelica.Electrical.Analog.Basic.Inductor.svg",
+  "info": [
+    "model",
+    "Ideal linear electrical inductor",
+    false,
+    false,
+    false,
+    "C:/OpenModelica/build/lib/omlibrary/Modelica 4.0.0/Electrical/Analog/Basic/Inductor.mo",
+    false,
+    2,
+    1,
+    47,
+    13,
+    [],
+    false,
+    false,
+    "",
+    "",
+    false,
+    ""
+  ],
+  "elements": [
+    {
+      "info": [
+        "Modelica.Units.SI.Inductance",
+        "L",
+        "Inductance",
+        "public",
+        "false",
+        "false",
+        "false",
+        "false",
+        "parameter",
+        "none",
+        "unspecified",
+        "{}"
+      ],
+      "annotation": "{}"
+    }
+  ],
+  "connections": [],
+  "extends": [
+    {
+      "className": "Modelica.Electrical.Analog.Interfaces.OnePort",
+      "info": [
+        "model",
+        "Component with two electrical pins p and n and current i from p to n",
+        true,
+        false,
+        false,
+        "C:/OpenModelica/build/lib/omlibrary/Modelica 4.0.0/Electrical/Analog/Interfaces/OnePort.mo",
+        false,
+        2,
+        1,
+        20,
+        12,
+        [],
+        false,
+        false,
+        "",
+        "",
+        false,
+        ""
+      ],
+      "elements": [
+        {
+          "info": [
+            "Modelica.Units.SI.Current",
+            "i",
+            "Current flowing from pin p to pin n",
+            "public",
+            "false",
+            "false",
+            "false",
+            "false",
+            "unspecified",
+            "none",
+            "unspecified",
+            "{}"
+          ],
+          "annotation": "{}"
+        }
+      ],
+      "connections": [],
+      "extends": [
+        {
+          "className": "Modelica.Electrical.Analog.Interfaces.TwoPin",
+          "info": [
+            "model",
+            "Component with two electrical pins",
+            true,
+            false,
+            false,
+            "C:/OpenModelica/build/lib/omlibrary/Modelica 4.0.0/Electrical/Analog/Interfaces/TwoPin.mo",
+            false,
+            2,
+            1,
+            22,
+            11,
+            [],
+            false,
+            false,
+            "",
+            "",
+            false,
+            ""
+          ],
+          "elements": [
+            {
+              "info": [
+                "Modelica.Units.SI.Voltage",
+                "v",
+                "Voltage drop of the two pins (= p.v - n.v)",
+                "public",
+                "false",
+                "false",
+                "false",
+                "false",
+                "unspecified",
+                "none",
+                "unspecified",
+                "{}"
+              ],
+              "annotation": "{}"
+            },
+            {
+              "info": [
+                "Modelica.Electrical.Analog.Interfaces.PositivePin",
+                "p",
+                "Positive electrical pin",
+                "public",
+                "false",
+                "false",
+                "false",
+                "false",
+                "unspecified",
+                "none",
+                "unspecified",
+                "{}"
+              ],
+              "annotation": "{Placement(true,-,-,-110.0,-10.0,-90.0,10.0,-,-,-,-,-,-,-,)}"
+            },
+            {
+              "info": [
+                "Modelica.Electrical.Analog.Interfaces.NegativePin",
+                "n",
+                "Negative electrical pin",
+                "public",
+                "false",
+                "false",
+                "false",
+                "false",
+                "unspecified",
+                "none",
+                "unspecified",
+                "{}"
+              ],
+              "annotation": "{Placement(true,-,-,90.0,-10.0,110.0,10.0,-,-,-,-,-,-,-,)}"
+            }
+          ],
+          "connections": [],
+          "extends": []
+        }
+      ]
+    }
+  ]
+}

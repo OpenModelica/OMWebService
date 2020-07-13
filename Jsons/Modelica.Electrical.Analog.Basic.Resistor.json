@@ -1,0 +1,332 @@
+{
+  "className": "Modelica.Electrical.Analog.Basic.Resistor",
+  "svgPath": "svg/Modelica.Electrical.Analog.Basic.Resistor.svg",
+  "info": [
+    "model",
+    "Ideal linear electrical resistor",
+    false,
+    false,
+    false,
+    "C:/OpenModelica/build/lib/omlibrary/Modelica 4.0.0/Electrical/Analog/Basic/Resistor.mo",
+    false,
+    2,
+    1,
+    58,
+    13,
+    [],
+    false,
+    false,
+    "",
+    "",
+    false,
+    ""
+  ],
+  "elements": [
+    {
+      "info": [
+        "Modelica.Units.SI.Resistance",
+        "R",
+        "Resistance at temperature T_ref",
+        "public",
+        "false",
+        "false",
+        "false",
+        "false",
+        "parameter",
+        "none",
+        "unspecified",
+        "{}"
+      ],
+      "annotation": "{}"
+    },
+    {
+      "info": [
+        "Modelica.Units.SI.Temperature",
+        "T_ref",
+        "Reference temperature",
+        "public",
+        "false",
+        "false",
+        "false",
+        "false",
+        "parameter",
+        "none",
+        "unspecified",
+        "{}"
+      ],
+      "annotation": "{}"
+    },
+    {
+      "info": [
+        "Modelica.Units.SI.LinearTemperatureCoefficient",
+        "alpha",
+        "Temperature coefficient of resistance (R_actual = R*(1 + alpha*(T_heatPort - T_ref))",
+        "public",
+        "false",
+        "false",
+        "false",
+        "false",
+        "parameter",
+        "none",
+        "unspecified",
+        "{}"
+      ],
+      "annotation": "{}"
+    },
+    {
+      "info": [
+        "Modelica.Units.SI.Resistance",
+        "R_actual",
+        "Actual resistance = R*(1 + alpha*(T_heatPort - T_ref))",
+        "public",
+        "false",
+        "false",
+        "false",
+        "false",
+        "unspecified",
+        "none",
+        "unspecified",
+        "{}"
+      ],
+      "annotation": "{}"
+    }
+  ],
+  "connections": [],
+  "extends": [
+    {
+      "className": "Modelica.Electrical.Analog.Interfaces.OnePort",
+      "info": [
+        "model",
+        "Component with two electrical pins p and n and current i from p to n",
+        true,
+        false,
+        false,
+        "C:/OpenModelica/build/lib/omlibrary/Modelica 4.0.0/Electrical/Analog/Interfaces/OnePort.mo",
+        false,
+        2,
+        1,
+        20,
+        12,
+        [],
+        false,
+        false,
+        "",
+        "",
+        false,
+        ""
+      ],
+      "elements": [
+        {
+          "info": [
+            "Modelica.Units.SI.Current",
+            "i",
+            "Current flowing from pin p to pin n",
+            "public",
+            "false",
+            "false",
+            "false",
+            "false",
+            "unspecified",
+            "none",
+            "unspecified",
+            "{}"
+          ],
+          "annotation": "{}"
+        }
+      ],
+      "connections": [],
+      "extends": [
+        {
+          "className": "Modelica.Electrical.Analog.Interfaces.TwoPin",
+          "info": [
+            "model",
+            "Component with two electrical pins",
+            true,
+            false,
+            false,
+            "C:/OpenModelica/build/lib/omlibrary/Modelica 4.0.0/Electrical/Analog/Interfaces/TwoPin.mo",
+            false,
+            2,
+            1,
+            22,
+            11,
+            [],
+            false,
+            false,
+            "",
+            "",
+            false,
+            ""
+          ],
+          "elements": [
+            {
+              "info": [
+                "Modelica.Units.SI.Voltage",
+                "v",
+                "Voltage drop of the two pins (= p.v - n.v)",
+                "public",
+                "false",
+                "false",
+                "false",
+                "false",
+                "unspecified",
+                "none",
+                "unspecified",
+                "{}"
+              ],
+              "annotation": "{}"
+            },
+            {
+              "info": [
+                "Modelica.Electrical.Analog.Interfaces.PositivePin",
+                "p",
+                "Positive electrical pin",
+                "public",
+                "false",
+                "false",
+                "false",
+                "false",
+                "unspecified",
+                "none",
+                "unspecified",
+                "{}"
+              ],
+              "annotation": "{Placement(true,-,-,-110.0,-10.0,-90.0,10.0,-,-,-,-,-,-,-,)}"
+            },
+            {
+              "info": [
+                "Modelica.Electrical.Analog.Interfaces.NegativePin",
+                "n",
+                "Negative electrical pin",
+                "public",
+                "false",
+                "false",
+                "false",
+                "false",
+                "unspecified",
+                "none",
+                "unspecified",
+                "{}"
+              ],
+              "annotation": "{Placement(true,-,-,90.0,-10.0,110.0,10.0,-,-,-,-,-,-,-,)}"
+            }
+          ],
+          "connections": [],
+          "extends": []
+        }
+      ]
+    },
+    {
+      "className": "Modelica.Electrical.Analog.Interfaces.ConditionalHeatPort",
+      "info": [
+        "model",
+        "Partial model to include a conditional HeatPort in order to describe the power loss via a thermal network",
+        true,
+        false,
+        false,
+        "C:/OpenModelica/build/lib/omlibrary/Modelica 4.0.0/Electrical/Analog/Interfaces/ConditionalHeatPort.mo",
+        false,
+        2,
+        1,
+        45,
+        24,
+        [],
+        false,
+        false,
+        "",
+        "",
+        false,
+        ""
+      ],
+      "elements": [
+        {
+          "info": [
+            "Boolean",
+            "useHeatPort",
+            "= true, if heatPort is enabled",
+            "public",
+            "false",
+            "false",
+            "false",
+            "false",
+            "parameter",
+            "none",
+            "unspecified",
+            "{}"
+          ],
+          "annotation": "{Evaluate=true, HideResult=true, choices(true,false)}"
+        },
+        {
+          "info": [
+            "Modelica.Units.SI.Temperature",
+            "T",
+            "Fixed device temperature if useHeatPort = false",
+            "public",
+            "false",
+            "false",
+            "false",
+            "false",
+            "parameter",
+            "none",
+            "unspecified",
+            "{}"
+          ],
+          "annotation": "{Dialog(\"General\",\"Parameters\",true,false,false,-,-,-,-,\"\",false)}"
+        },
+        {
+          "info": [
+            "Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a",
+            "heatPort",
+            "Conditional heat port",
+            "public",
+            "false",
+            "false",
+            "false",
+            "false",
+            "unspecified",
+            "none",
+            "unspecified",
+            "{}"
+          ],
+          "annotation": "{Placement(true,-,-,-10.0,-110.0,10.0,-90.0,-,-,-,-10.0,-110.0,10.0,-90.0,)}"
+        },
+        {
+          "info": [
+            "Modelica.Units.SI.Power",
+            "LossPower",
+            "Loss power leaving component via heatPort",
+            "public",
+            "false",
+            "false",
+            "false",
+            "false",
+            "unspecified",
+            "none",
+            "unspecified",
+            "{}"
+          ],
+          "annotation": "{}"
+        },
+        {
+          "info": [
+            "Modelica.Units.SI.Temperature",
+            "T_heatPort",
+            "Temperature of heatPort",
+            "public",
+            "false",
+            "false",
+            "false",
+            "false",
+            "unspecified",
+            "none",
+            "unspecified",
+            "{}"
+          ],
+          "annotation": "{}"
+        }
+      ],
+      "connections": [],
+      "extends": []
+    }
+  ]
+}
