@@ -1,0 +1,148 @@
+{
+  "className": "Modelica.Electrical.Analog.Sources.SineVoltage",
+  "svgPath": "svg/Modelica.Electrical.Analog.Sources.SineVoltage.svg",
+  "info": [
+    "model",
+    "Sine voltage source",
+    false,
+    false,
+    false,
+    "C:/OpenModelica/build/lib/omlibrary/Modelica 4.0.0/Electrical/Analog/Sources/SineVoltage.mo",
+    false,
+    2,
+    1,
+    34,
+    16,
+    [],
+    false,
+    false,
+    "",
+    "",
+    false,
+    ""
+  ],
+  "connectors": [
+    {
+      "info": [
+        "Modelica.Electrical.Analog.Interfaces.PositivePin",
+        "p",
+        "Positive electrical pin",
+        "public",
+        "false",
+        "false",
+        "false",
+        "false",
+        "unspecified",
+        "none",
+        "unspecified",
+        "{}"
+      ],
+      "annotation": "{Placement(true,-,-,-110.0,-10.0,-90.0,10.0,-,-,-,-,-,-,-,)}"
+    },
+    {
+      "info": [
+        "Modelica.Electrical.Analog.Interfaces.NegativePin",
+        "n",
+        "Negative electrical pin",
+        "public",
+        "false",
+        "false",
+        "false",
+        "false",
+        "unspecified",
+        "none",
+        "unspecified",
+        "{}"
+      ],
+      "annotation": "{Placement(true,-,-,90.0,-10.0,110.0,10.0,-,-,-,-,-,-,-,)}"
+    }
+  ],
+  "parameters": [
+    {
+      "info": [
+        "Modelica.Units.SI.Voltage",
+        "V",
+        "Amplitude of sine wave",
+        "public",
+        "false",
+        "false",
+        "false",
+        "false",
+        "parameter",
+        "none",
+        "unspecified",
+        "{}"
+      ],
+      "annotation": "{}"
+    },
+    {
+      "info": [
+        "Modelica.Units.SI.Angle",
+        "phase",
+        "Phase of sine wave",
+        "public",
+        "false",
+        "false",
+        "false",
+        "false",
+        "parameter",
+        "none",
+        "unspecified",
+        "{}"
+      ],
+      "annotation": "{}"
+    },
+    {
+      "info": [
+        "Modelica.Units.SI.Frequency",
+        "f",
+        "Frequency of sine wave",
+        "public",
+        "false",
+        "false",
+        "false",
+        "false",
+        "parameter",
+        "none",
+        "unspecified",
+        "{}"
+      ],
+      "annotation": "{}"
+    },
+    {
+      "info": [
+        "Modelica.Units.SI.Voltage",
+        "offset",
+        "Voltage offset",
+        "public",
+        "false",
+        "false",
+        "false",
+        "false",
+        "parameter",
+        "none",
+        "unspecified",
+        "{}"
+      ],
+      "annotation": "{}"
+    },
+    {
+      "info": [
+        "Modelica.Units.SI.Time",
+        "startTime",
+        "Time offset",
+        "public",
+        "false",
+        "false",
+        "false",
+        "false",
+        "parameter",
+        "none",
+        "unspecified",
+        "{}"
+      ],
+      "annotation": "{}"
+    }
+  ],
+  "connections": []
+}

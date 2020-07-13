@@ -1,0 +1,45 @@
+{
+  "className": "Modelica.Electrical.Analog.Basic.Ground",
+  "svgPath": "svg/Modelica.Electrical.Analog.Basic.Ground.svg",
+  "info": [
+    "model",
+    "Ground node",
+    false,
+    false,
+    false,
+    "C:/OpenModelica/build/lib/omlibrary/Modelica 4.0.0/Electrical/Analog/Basic/Ground.mo",
+    false,
+    2,
+    1,
+    31,
+    11,
+    [],
+    false,
+    false,
+    "",
+    "",
+    false,
+    ""
+  ],
+  "connectors": [
+    {
+      "info": [
+        "Modelica.Electrical.Analog.Interfaces.Pin",
+        "p",
+        "",
+        "public",
+        "false",
+        "false",
+        "false",
+        "false",
+        "unspecified",
+        "none",
+        "unspecified",
+        "{}"
+      ],
+      "annotation": "{Placement(true,0.0,100.0,10.0,-10.0,-10.0,10.0,270.0,-,-,-,-,-,-,)}"
+    }
+  ],
+  "parameters": [],
+  "connections": []
+}

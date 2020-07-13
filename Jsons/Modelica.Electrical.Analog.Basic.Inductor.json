@@ -1,0 +1,80 @@
+{
+  "className": "Modelica.Electrical.Analog.Basic.Inductor",
+  "svgPath": "svg/Modelica.Electrical.Analog.Basic.Inductor.svg",
+  "info": [
+    "model",
+    "Ideal linear electrical inductor",
+    false,
+    false,
+    false,
+    "C:/OpenModelica/build/lib/omlibrary/Modelica 4.0.0/Electrical/Analog/Basic/Inductor.mo",
+    false,
+    2,
+    1,
+    47,
+    13,
+    [],
+    false,
+    false,
+    "",
+    "",
+    false,
+    ""
+  ],
+  "connectors": [
+    {
+      "info": [
+        "Modelica.Electrical.Analog.Interfaces.PositivePin",
+        "p",
+        "Positive electrical pin",
+        "public",
+        "false",
+        "false",
+        "false",
+        "false",
+        "unspecified",
+        "none",
+        "unspecified",
+        "{}"
+      ],
+      "annotation": "{Placement(true,-,-,-110.0,-10.0,-90.0,10.0,-,-,-,-,-,-,-,)}"
+    },
+    {
+      "info": [
+        "Modelica.Electrical.Analog.Interfaces.NegativePin",
+        "n",
+        "Negative electrical pin",
+        "public",
+        "false",
+        "false",
+        "false",
+        "false",
+        "unspecified",
+        "none",
+        "unspecified",
+        "{}"
+      ],
+      "annotation": "{Placement(true,-,-,90.0,-10.0,110.0,10.0,-,-,-,-,-,-,-,)}"
+    }
+  ],
+  "parameters": [
+    {
+      "info": [
+        "Modelica.Units.SI.Inductance",
+        "L",
+        "Inductance",
+        "public",
+        "false",
+        "false",
+        "false",
+        "false",
+        "parameter",
+        "none",
+        "unspecified",
+        "{}"
+      ],
+      "annotation": "{}"
+    }
+  ],
+  "connections": []
+}
