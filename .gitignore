@@ -1,4 +1,12 @@
-.idea/
+# IDE Files
+.vscode
+.idea
 *.iml
-node_modules/
+
+# package directories
+node_modules
+jspm_packages
 dist/
+
+# Serverless directories
+.serverless
