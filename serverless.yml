@@ -1,0 +1,43 @@
+# Welcome to serverless. Read the docs
+# https://serverless.com/framework/docs/
+
+# Serverless.yml is the configuration the CLI
+# uses to deploy your code to your provider of choice
+
+# The `service` block is the name of the service
+service: omwebservice-api-docs
+
+# The `provider` block defines where your service will be deployed
+provider:
+  name: aws
+  runtime: nodejs12.x
+  profile: beancrunch
+  region: eu-central-1
+
+plugins:
+  - serverless-s3-deploy
+
+custom:
+  assets:
+    targets:
+      - bucket:
+          Ref: DocsBucket
+        acl: public-read
+        files:
+          - source: ./dist/
+            globs: '**/*.html'
+            defaultContentType: text/html
+          - source: ./dist/
+            globs: '**/*.js'
+            defaultContentType: application/javascript
+
+resources:
+  # AWS CloudFormation Template
+  Resources:
+    DocsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        AccessControl: PublicRead
+        WebsiteConfiguration:
+          IndexDocument: index.html
+          ErrorDocument: index.html
