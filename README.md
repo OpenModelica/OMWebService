@@ -1,14 +1,17 @@
+# OMWebService API Documentation
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-### Demo of Swagger UI with Webpack.
+- [OMWebService API Documentation](#omwebservice-api-documentation)
+  - [Developer Guide](#developer-guide)
+    - [Running Locally](#running-locally)
 
-This `webpack-getting-started` sample is for reference only.
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-It includes CSS and OAuth configuration.
-
-`_sample_package.json` is a placeholder sample. You should rename this file, per `Usage` section below, and you should also verify and update this sample's `@latest` compared to the `swagger-ui@latest`
-
-
-#### Usage
-    rename `_sample_package.json` to `package.json`
-    npm install
-    npm start
+## Developer Guide
+### Running Locally
+```    
+npm install
+npm start
+```
