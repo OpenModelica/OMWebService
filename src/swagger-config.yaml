@@ -19,6 +19,7 @@ paths:
           required: true
           schema:
             type: string
+          example: Modelica.Electrical.Analog.Basic.Inductor
       responses:
         '200':
           description: foo
