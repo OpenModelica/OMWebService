@@ -27,9 +27,13 @@ custom:
           - source: ./dist/
             globs: '**/*.html'
             defaultContentType: text/html
+            headers:
+              CacheControl: no-store
           - source: ./dist/
             globs: '**/*.js'
             defaultContentType: application/javascript
+            headers:
+              CacheControl: no-store
 
 resources:
   # AWS CloudFormation Template
