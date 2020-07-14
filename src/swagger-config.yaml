@@ -1,30 +1,101 @@
-openapi: "3.0.0"
+openapi: 3.0.0
 info:
-  version: "0.0.1"
-  title: "Swagger UI Webpack Setup"
-  description: "Demonstrates Swagger UI with Webpack including CSS and OAuth"
-servers:
-  - url: "https://demo.identityserver.io/api"
-    description: "Identity Server test API"
-components:
-  securitySchemes:
-    # See https://demo.identityserver.io/ for configuration details.
-    identity_server_auth:
-      type: oauth2
-      flows:
-        implicit:
-          authorizationUrl: "https://demo.identityserver.io/connect/authorize"
-          scopes:
-            api: "api"
-security:
-  - identity_server_auth:
-    - api
+  description: OMWebService API Documentation
+  version: "1.0.0-oas3"
+  title: OMWebService API Documentation
+  contact:
+    email: foo@example.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 paths:
-  /test:
+  '/components/{componentId}':
     get:
-      summary: "Runs a test request against the Identity Server demo API"
+      tags:
+        - developers
+      parameters:
+        - in: path
+          name: componentId
+          required: true
+          schema:
+            type: string
       responses:
-        401:
-          description: "Unauthorized"
-        200:
-          description: "OK"
+        '200':
+          description: foo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Component'
+components:
+  schemas:
+    Component:
+      type: object
+      properties:
+        id:
+          type: string
+        svgPath:
+          type: string
+          format: url
+        connectors:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              placement:
+                type: object
+                properties:
+                  visible:
+                    type: boolean
+                  bottomLeft:
+                    type: object
+                    properties:
+                      x:
+                        type: number
+                      y:
+                        type: number
+                  topRight:
+                    type: object
+                    properties:
+                      x:
+                        type: number
+                      y:
+                        type: number
+                  rotation:
+                    type: number
+        parameters:
+          type: array
+          items:
+            type: object
+            properties:
+              displayLabel:
+                type: string
+              displayValue:
+                type: string
+      example:
+        id: Modelica.Electrical.Analog.Basic.Inductor
+        svgPath: ./assets/inductor.svg
+        connectors:
+          - id: Modelica.Electrical.Analog.Interfaces.PositivePin
+            placement:
+              bottomLeft:
+                x: 100
+                y: 100
+              topRight:
+                x: 200
+                y: 200
+              rotation: 90
+          - id: Modelica.Electrical.Analog.Interfaces.NegativePin
+            placement:
+              bottomLeft:
+                x: 100
+                y: 100
+              topRight:
+                x: 200
+                y: 200
+              rotation: 90
+        parameters:
+          - id: Modelica.Units.SI.Inductance
+            displayLabel: Inductance
+            displayValue: 1
