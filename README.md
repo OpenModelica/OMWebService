@@ -13,7 +13,7 @@
 OMWebService API documentation defined in [swagger-config.yaml](./src/swagger-config.yaml) using 
 [OpenAPI Specification](https://swagger.io/specification/), rendered using [Swagger-UI](https://swagger.io/tools/swagger-ui/)
 and deployed to AWS S3 to be viewed in the browser using this url: 
-[https://omwebservice-api-docs-dev-docsbucket-nta537smvlwl.s3.eu-central-1.amazonaws.com/index.html](https://omwebservice-api-docs-dev-docsbucket-nta537smvlwl.s3.eu-central-1.amazonaws.com/index.html)
+[https://omwebservice-api-docs-dev-docsbucket-63c7h6kaz6lp.s3.eu-central-1.amazonaws.com/index.html](https://omwebservice-api-docs-dev-docsbucket-63c7h6kaz6lp.s3.eu-central-1.amazonaws.com/index.html)
 
 ## Developer Guide
 ### Running Locally
