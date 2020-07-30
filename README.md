@@ -19,7 +19,7 @@ and deployed to AWS S3 to be viewed in the browser using this url:
 ### Running Locally
 ```    
 npm install
-npm start
+npm run start
 ```
 
 ### Deploying Using Serverless Framework
