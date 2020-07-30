@@ -34,9 +34,18 @@ components:
       properties:
         id:
           type: string
+        displayLabel:
+          type: string
         svgPath:
           type: string
           format: url
+        size:
+          type: object
+          properties:
+            width:
+              type: number
+            height:
+              type: number
         connectors:
           type: array
           items:
@@ -44,19 +53,13 @@ components:
             properties:
               id:
                 type: string
+              svgPath:
+                type: string
+                format: url
               placement:
                 type: object
                 properties:
-                  visible:
-                    type: boolean
                   bottomLeft:
-                    type: object
-                    properties:
-                      x:
-                        type: number
-                      y:
-                        type: number
-                  topRight:
                     type: object
                     properties:
                       x:
@@ -76,25 +79,25 @@ components:
                 type: string
       example:
         id: Modelica.Electrical.Analog.Basic.Inductor
-        svgPath: ./assets/inductor.svg
+        displayLabel: Analog Inductor
+        svgPath: https://hostname:port/assets/Modelica.Electrical.Analog.Basic.Inductor.svg
+        size:
+          width: 310
+          height: 210
         connectors:
           - id: Modelica.Electrical.Analog.Interfaces.PositivePin
+            svgPath: https://hostname:port/assets/Modelica.Electrical.Analog.Interfaces.PositivePin.svg
             placement:
               bottomLeft:
                 x: 100
                 y: 100
-              topRight:
-                x: 200
-                y: 200
               rotation: 90
           - id: Modelica.Electrical.Analog.Interfaces.NegativePin
+            svgPath: https://hostname:port/assets/Modelica.Electrical.Analog.Interfaces.NegativePin.svg
             placement:
               bottomLeft:
                 x: 100
                 y: 100
-              topRight:
-                x: 200
-                y: 200
               rotation: 90
         parameters:
           - id: Modelica.Units.SI.Inductance
