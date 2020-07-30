@@ -22,11 +22,24 @@ paths:
           example: Modelica.Electrical.Analog.Basic.Inductor
       responses:
         '200':
-          description: foo
+          description: Component with specified componentId
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Component'
+  '/components':
+    get:
+      tags:
+        - developers
+      responses:
+        '200':
+          description: List of all components
+          content:
+            applicaiton/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Component'
 components:
   schemas:
     Component:
