@@ -9,45 +9,83 @@ info:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 paths:
-  '/components/{componentId}':
-    get:
-      tags:
-        - developers
-      parameters:
-        - in: path
-          name: componentId
-          required: true
-          schema:
-            type: string
-          example: Modelica.Electrical.Analog.Basic.Inductor
-      responses:
-        '200':
-          description: Component with specified componentId
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Component'
-  '/components':
+  '/component-library':
     get:
       tags:
         - developers
       responses:
         '200':
-          description: List of all components
+          description: Hierarchical list of all components
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Component'
+                $ref: '#/components/schemas/Collection'
+
 components:
   schemas:
+    Collection:
+      type: object
+      properties:
+        id:
+          type: string
+        displayLabel:
+          type: string
+        nodeType:
+          type: string
+        svgPath:
+          type: string
+        children:
+          type: array
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/Collection'
+              - $ref: '#/components/schemas/Component'
+      example:
+        id: Modelica.Electrical
+        displayLabel: Electrical
+        nodeType: collection
+        svgPath: https://hostname:port/assets/Modelica.Electrical.svg
+        children:
+          - id: Modelica.Electrical.Analog
+            displayLabel: Analog
+            nodeType: collection
+            smallIcon: https://hostname:port/assets/Modelica.Electrical.Analog.svg
+            children:
+              - id: Modelica.Electrical.Analog.Basic.Inductor
+                displayLabel: Analog Inductor
+                nodeType: component
+                svgPath: https://hostname:port/assets/Modelica.Electrical.Analog.Basic.Inductor.svg
+                size:
+                  width: 310
+                  height: 210
+                connectors:
+                  - id: Modelica.Electrical.Analog.Interfaces.PositivePin
+                    svgPath: https://hostname:port/assets/Modelica.Electrical.Analog.Interfaces.PositivePin.svg
+                    placement:
+                      bottomLeft:
+                        x: 100
+                        y: 100
+                      rotation: 90
+                  - id: Modelica.Electrical.Analog.Interfaces.NegativePin
+                    svgPath: https://hostname:port/assets/Modelica.Electrical.Analog.Interfaces.NegativePin.svg
+                    placement:
+                      bottomLeft:
+                        x: 100
+                        y: 100
+                      rotation: 90
+                parameters:
+                  - id: Modelica.Units.SI.Inductance
+                    displayLabel: Inductance
+                    displayValue: 1
+
     Component:
       type: object
       properties:
         id:
           type: string
         displayLabel:
+          type: string
+        nodeType:
           type: string
         svgPath:
           type: string
@@ -93,6 +131,7 @@ components:
       example:
         id: Modelica.Electrical.Analog.Basic.Inductor
         displayLabel: Analog Inductor
+        nodeType: component
         svgPath: https://hostname:port/assets/Modelica.Electrical.Analog.Basic.Inductor.svg
         size:
           width: 310
