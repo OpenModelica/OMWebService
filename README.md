@@ -3,9 +3,14 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [OMWebService API Documentation](#omwebservice-api-documentation)
-  - [Developer Guide](#developer-guide)
-    - [Running Locally](#running-locally)
+- [Introduction](#introduction)
+- [Developer Guide](#developer-guide)
+  - [Running Locally](#running-locally)
+  - [Deploying Using Serverless Framework](#deploying-using-serverless-framework)
+    - [Build for Deployment](#build-for-deployment)
+    - [Init Serverless Stack](#init-serverless-stack)
+    - [Deploy API-Docs to S3](#deploy-api-docs-to-s3)
+    - [Remove Serveless Stack](#remove-serveless-stack)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
