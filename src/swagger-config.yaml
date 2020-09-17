@@ -9,13 +9,13 @@ info:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 paths:
-  '/component-library':
+  '/library-nodes':
     get:
       tags:
         - developers
       responses:
         '200':
-          description: Hierarchical list of all components
+          description: Hierarchical list of all library nodes
           content:
             application/json:
               schema:
@@ -49,7 +49,7 @@ components:
           - id: Modelica.Electrical.Analog
             displayLabel: Analog
             nodeType: collection
-            smallIcon: https://hostname:port/assets/Modelica.Electrical.Analog.svg
+            svgPath: https://hostname:port/assets/Modelica.Electrical.Analog.svg
             children:
               - id: Modelica.Electrical.Analog.Basic.Inductor
                 displayLabel: Analog Inductor
