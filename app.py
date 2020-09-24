@@ -39,8 +39,6 @@ log = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-from flask_restx import Resource, Api
-
 def configure_app():
   app.config['SERVER_NAME'] = settings.FLASK_SERVER_NAME
   logging.basicConfig(level=logging.DEBUG)

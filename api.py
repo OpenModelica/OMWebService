@@ -31,7 +31,7 @@ See the full OSMC Public License conditions for more details.
 """
 
 import logging
-from flask_restx import Resource, Api, fields
+from flask_restx import Resource, Api
 import omcproxy
 from flask_restx import reqparse
 from flask_restx import inputs
@@ -62,9 +62,9 @@ class libraryNodes(Resource):
 
     nodesJson = []
     if nodeName == "AllLoadedClasses":
-      classnames = omcproxy.ask_omc("getClassNames(%s, false, false, %s, false, true, false)" % (nodeName, sort))
-      for classname in classnames:
-        nodesJson.append(self.getNodeJson(classname, recursive, False, sort))
+      classNames = omcproxy.ask_omc("getClassNames(%s, false, false, %s, false, true, false)" % (nodeName, sort))
+      for className in classNames:
+        nodesJson.append(self.getNodeJson(className, recursive, False, sort))
       return nodesJson
     else:
       return self.getNodeJson(nodeName, recursive, True, sort)
@@ -82,9 +82,9 @@ class libraryNodes(Resource):
 
     children = []
     if recursive or topLevel:
-      classnames = omcproxy.ask_omc("getClassNames(%s, false, false, %s, false, true, false)" % (nodeName, sort))
-      for classname in classnames:
-        children.append(self.getNodeJson("{0}.{1}".format(nodeName, classname), recursive, False, sort))
+      classNames = omcproxy.ask_omc("getClassNames(%s, false, false, %s, false, true, false)" % (nodeName, sort))
+      for className in classNames:
+        children.append(self.getNodeJson("{0}.{1}".format(nodeName, className), recursive, False, sort))
 
     nodeJson["children"] = children
     parameters = []

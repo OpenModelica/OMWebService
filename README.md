@@ -5,7 +5,7 @@ OpenModelica web service, queries via a REST API
 
 - [Python >= 3.8.5](https://www.python.org/)
 - [OpenModelica >= 1.16.0](https://openmodelica.org)
-- Required python packages are installed via requirement.txt
+- Required python packages are installed via requirements.txt
 
 ## Build instructions
 
