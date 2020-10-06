@@ -13,7 +13,7 @@ pipeline {
             }
           }
           steps {
-            sh 'pylint *'
+            sh 'pylint --rcfile=.pylintrc *'
           }
         }
       }
