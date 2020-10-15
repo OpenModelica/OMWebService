@@ -32,21 +32,23 @@ See the full OSMC Public License conditions for more details.
 
 import logging
 from flask_restx import Resource, Api
-import omcproxy
+import omc_proxy
 from flask_restx import reqparse
 from flask_restx import inputs
+import svg_writer
+import flask
 
 log = logging.getLogger(__name__)
 
 api = Api(version='1.0', title='OMWebService API', description='OMWebService API Documentation')
 
 @api.route("/version")
-class version(Resource):
+class Version(Resource):
   def get(self):
-    return omcproxy.ask_omc("getVersion()")
+    return omc_proxy.sendCommand("getVersion()")
 
 @api.route("/library-nodes/")
-class libraryNodes(Resource):
+class LibraryNodes(Resource):
   parser = reqparse.RequestParser()
   parser.add_argument("name", default = "AllLoadedClasses", help = "A Modelica node name")
   parser.add_argument("recursive", type = inputs.boolean, default = True, help = "List all node names recursively")
@@ -58,11 +60,11 @@ class libraryNodes(Resource):
     args = self.parser.parse_args()
     nodeName = args["name"]
     recursive = args["recursive"]
-    sort = omcproxy.pythonBoolToModelicaBool(args["sort"])
+    sort = omc_proxy.pythonBoolToModelicaBool(args["sort"])
 
     nodesJson = []
     if nodeName == "AllLoadedClasses":
-      classNames = omcproxy.ask_omc("getClassNames(%s, false, false, %s, false, true, false)" % (nodeName, sort))
+      classNames = omc_proxy.sendCommand("getClassNames({0}, false, false, {1}, false, true, false)".format(nodeName, sort))
       for className in classNames:
         nodesJson.append(self.getNodeJson(className, recursive, False, sort))
       return nodesJson
@@ -72,17 +74,28 @@ class libraryNodes(Resource):
   def getNodeJson(self, nodeName, recursive, topLevel, sort):
     nodeJson = dict()
     nodeJson["id"] = nodeName
-    nodeJson["displayLabel"] = omcproxy.getLastWordAfterDot(nodeName)
-    classInfo = omcproxy.ask_omc("getClassInformation(%s)" % (nodeName))
+    nodeJson["displayLabel"] = omc_proxy.getLastWordAfterDot(nodeName)
+    classInfo = omc_proxy.sendCommand("getClassInformation({0})".format(nodeName))
     if classInfo[0] == 'package':
       nodeJson["nodeType"] = "collection"
     else:
       nodeJson["nodeType"] = "component"
-    nodeJson["svgPath"] = "" # add icon svg code
+
+    baseClasses = []
+    omc_proxy.getBaseClasses(nodeName, baseClasses)
+
+    iconGraphics = []
+    for baseClass in baseClasses:
+      graphics = omc_proxy.getClassGraphics(baseClass)
+      iconGraphics.insert(0, graphics)
+    graphics = omc_proxy.getClassGraphics(nodeName)
+    iconGraphics.append(graphics)
+
+    nodeJson["svgPath"] = self.generateSVG("{0}.svg".format(nodeName), iconGraphics)
 
     children = []
     if recursive or topLevel:
-      classNames = omcproxy.ask_omc("getClassNames(%s, false, false, %s, false, true, false)" % (nodeName, sort))
+      classNames = omc_proxy.sendCommand("getClassNames({0}, false, false, {1}, false, true, false)".format(nodeName, sort))
       for className in classNames:
         children.append(self.getNodeJson("{0}.{1}".format(nodeName, className), recursive, False, sort))
 
@@ -93,3 +106,21 @@ class libraryNodes(Resource):
     nodeJson["parameters"] = parameters
 
     return nodeJson
+
+  def generateSVG(self, fileName, iconGraphics):
+    svg_writer.writeSVG(fileName, iconGraphics)
+    return fileName
+
+@api.route("/download/")
+class Download(Resource):
+  parser = reqparse.RequestParser()
+  parser.add_argument("filePath", required = True, default = "", help = "Path to download SVG file")
+
+  @api.expect(parser)
+  @api.produces(['image/svg+xml'])
+  def get(self):
+    """Downloads the contents of SVG file."""
+    args = self.parser.parse_args()
+    filePath = args["filePath"]
+    return flask.send_file(filePath)
+
