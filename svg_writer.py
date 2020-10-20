@@ -652,9 +652,6 @@ def writeSVG(fileName, iconGraphics):
   width = maxX - minX
   height = maxY - minY
 
-  print(width)
-  print(height)
-
   dwg = svgwrite.Drawing(fileName, size=(width, height), viewBox="0 0 " + str(width) + " " + str(height))
   # Makes hashing not work
   # dwg.add(svgwrite.base.Desc(iconGraphics[-1]['className']))
@@ -667,5 +664,6 @@ def writeSVG(fileName, iconGraphics):
         dwg.add(svgShape[1])
 
   dwg.save(pretty=True)
+  return width, height
 
 

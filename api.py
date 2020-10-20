@@ -33,6 +33,7 @@ See the full OSMC Public License conditions for more details.
 import logging
 from flask_restx import Resource, Api
 import omc_proxy
+import util
 from flask_restx import reqparse
 from flask_restx import inputs
 import svg_writer
@@ -60,7 +61,7 @@ class LibraryNodes(Resource):
     args = self.parser.parse_args()
     nodeName = args["name"]
     recursive = args["recursive"]
-    sort = omc_proxy.pythonBoolToModelicaBool(args["sort"])
+    sort = util.pythonBoolToModelicaBool(args["sort"])
 
     nodesJson = []
     if nodeName == "AllLoadedClasses":
@@ -74,24 +75,18 @@ class LibraryNodes(Resource):
   def getNodeJson(self, nodeName, recursive, topLevel, sort):
     nodeJson = dict()
     nodeJson["id"] = nodeName
-    nodeJson["displayLabel"] = omc_proxy.getLastWordAfterDot(nodeName)
+    nodeJson["displayLabel"] = util.getLastWordAfterDot(nodeName)
     classInfo = omc_proxy.sendCommand("getClassInformation({0})".format(nodeName))
     if classInfo[0] == 'package':
       nodeJson["nodeType"] = "collection"
     else:
       nodeJson["nodeType"] = "component"
 
-    baseClasses = []
-    omc_proxy.getBaseClasses(nodeName, baseClasses)
+    (iconGraphics, connectors, parameters) = omc_proxy.getIconGraphicsConnectorsAndParameters(nodeName)
 
-    iconGraphics = []
-    for baseClass in baseClasses:
-      graphics = omc_proxy.getClassGraphics(baseClass)
-      iconGraphics.insert(0, graphics)
-    graphics = omc_proxy.getClassGraphics(nodeName)
-    iconGraphics.append(graphics)
-
-    nodeJson["svgPath"] = self.generateSVG("{0}.svg".format(nodeName), iconGraphics)
+    path = "{0}.svg".format(nodeName)
+    (width, height) = svg_writer.writeSVG(path, iconGraphics)
+    nodeJson['svg'] = util.svgJson(path, width, height)
 
     children = []
     if recursive or topLevel:
@@ -100,16 +95,11 @@ class LibraryNodes(Resource):
         children.append(self.getNodeJson("{0}.{1}".format(nodeName, className), recursive, False, sort))
 
     nodeJson["children"] = children
-    parameters = []
-    connectors = []
+    
     nodeJson["connectors"] = connectors
     nodeJson["parameters"] = parameters
 
     return nodeJson
-
-  def generateSVG(self, fileName, iconGraphics):
-    svg_writer.writeSVG(fileName, iconGraphics)
-    return fileName
 
 @api.route("/download/")
 class Download(Resource):

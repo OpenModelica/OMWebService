@@ -32,7 +32,9 @@ See the full OSMC Public License conditions for more details.
 
 import logging
 from OMPython import OMCSessionZMQ
+import util
 import re
+import svg_writer
 
 log = logging.getLogger(__name__)
 omc = OMCSessionZMQ()
@@ -49,40 +51,56 @@ def sendCommand(expression, parsed=True):
 
   return res
 
-def pythonBoolToModelicaBool(value):
-  if value:
-    return "true"
-  else:
-    return "false"
-
 if not sendCommand('loadModel(Modelica)', True):
   log.critical('Failed to load Modelica standard library: {0}'.format(omc.sendExpression('getErrorString()')))
 
-def wordsBeforeAfterLastDot(value, lastWord):
-  if not value:
-    return ""
+def getIconGraphicsConnectorsAndParametersHelper(className, iconGraphics, connectors, parameters):
+  iconGraphics.append(getClassGraphics(className))
+  componentsList = getComponents(className)
+  if componentsList:
+    componentAnnotations = getComponentAnnotations(className)
 
-  value = value.strip()
-  pos = 0
-  if value.endswith('\''):
-    i = len(value) - 2
-    while value[i] != '\'' and i > 1 and value[i-1] != '\\':
-      i -= 1
+    for i in range(len(componentsList)):
+      try:
+        componentInfo = util.unparseStrings(componentsList[i])
+        if sendCommand("isConnector({0})".format(componentInfo[0])):
+          component = dict()
+          component['id'] = componentInfo[0]
+          path = "{0}.svg".format(componentInfo[0])
+          (width, height) = svg_writer.writeSVG(path, [getClassGraphics(componentInfo[0])])
+          component['svg'] = util.svgJson(path, width, height)
+          component['placement'] = util.componentPlacement(componentAnnotations[i])
+          connectors.append(component)
+        elif (componentInfo[8] == 'parameter'):
+          component = dict()
+          component['id'] = componentInfo[0]
+          component['displayLabel'] = componentInfo[1]
+          parameters.append(component)
+      except KeyError as ex:
+        log.error("KeyError: {0} index: {1} {2}".format(className, i+1, str(ex)))
+        continue
 
-    pos = i - 1
-  else:
-    pos = value.rfind('.')
+def getIconGraphicsConnectorsAndParameters(className):
+  baseClasses = []
+  getBaseClasses(className, baseClasses)
 
-  if pos >= 0:
-    if lastWord:
-      return value[pos+1:len(value)]
-    else:
-      return value[0:pos]
-  else:
-    return value
+  iconGraphics = []
+  connectors = []
+  parameters = []
 
-def getLastWordAfterDot(value):
-  return wordsBeforeAfterLastDot(value, True)
+  for baseClass in reversed(baseClasses):
+    getIconGraphicsConnectorsAndParametersHelper(baseClass, iconGraphics, connectors, parameters)
+  getIconGraphicsConnectorsAndParametersHelper(className, iconGraphics, connectors, parameters)
+
+  return iconGraphics, connectors, parameters
+
+def getComponents(className):
+  return util.unparseArrays(sendCommand("getComponents({0}, useQuotes = true)".format(className), parsed=False))
+
+def getComponentAnnotations(className):
+  componentAnnotations = sendCommand("getComponentAnnotations({0})".format(className), parsed=False)
+  componentAnnotationsList = util.getStrings(util.removeFirstLastCurlBrackets(componentAnnotations))
+  return componentAnnotationsList
 
 # Note: The order of the base classes matters
 def getBaseClasses(className, baseClasses):
@@ -138,9 +156,9 @@ def getClassGraphics(className):
   classGraphics['coordinateSystem']['extent'] = [[-100, -100], [100, 100]]
 
   shapes = ""
-  shape = regexCoOrdinateSystem.search(iconAnnotation)
-  if shape:
-    g = shape.groups()
+  coOrdinateSystem = regexCoOrdinateSystem.search(iconAnnotation)
+  if coOrdinateSystem:
+    g = coOrdinateSystem.groups()
     classGraphics['coordinateSystem']['extent'] = [[float(g[0]), float(g[1])], [float(g[2]), float(g[3])]]
     classGraphics['coordinateSystem']['preserveAspectRatio'] = bool(g[4])
     classGraphics['coordinateSystem']['initialScale'] = float(g[5])
