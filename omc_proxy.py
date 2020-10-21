@@ -114,120 +114,86 @@ def getBaseClasses(className, baseClasses):
 
 # get graphics objects from annotation Icon
 def getClassGraphics(className):
-
-  exp_float = '[+-]?\d+(?:.\d+)?(?:e[+-]?\d+)?'
-  # Compile regular expressions ONLY once!
-  # example: {-100.0,-100.0,100.0,100.0,true,0.16,2.0,2.0, {...
-  regexCoOrdinateSystem = re.compile('('+exp_float+'),('+exp_float+'),('+exp_float+'),('+exp_float+'),(\w+),('+exp_float+'),('+exp_float+'),('+exp_float+'),')
-
-  # example: Rectangle(true, {35.0, 10.0}, 0, {0, 0, 0}, {255, 255, 255}, LinePattern.Solid, FillPattern.Solid, 0.25, BorderPattern.None, {{-15.0, -4.0}, {15.0, 4.0}}, 0
-  regexRectangle = re.compile('Rectangle\(([\w ]+), {('+exp_float+'), ('+exp_float+')}, ('+exp_float+'), {(\d+), (\d+), (\d+)}, {(\d+), (\d+), (\d+)}, (\w+.\w+), (\w+.\w+), ('+exp_float+'), (\w+.\w+), {{('+exp_float+'), ('+exp_float+')}, {('+exp_float+'), ('+exp_float+')}}, ('+exp_float+')')
-
-  # example: Line(true, {0.0, 0.0}, 0, {{-30, -120}, {-10, -100}}, {0, 0, 0}, LinePattern.Solid, 0.25, {Arrow.None, Arrow.None}, 3, Smooth.None
-  regexLine = re.compile('Line\(([\w ]+), {('+exp_float+'), ('+exp_float+')}, ('+exp_float+'), ({{'+exp_float+', '+exp_float+'}(?:, {'+exp_float+', '+exp_float+'})*}), {(\d+), (\d+), (\d+)}, (\w+.\w+), ('+exp_float+'), {(\w+.\w+), (\w+.\w+)}, ('+exp_float+'), (\w+.\w+)')
-
-  # example: Ellipse(true, {0.0, 0.0}, 0, {0, 0, 0}, {95, 95, 95}, LinePattern.Solid, FillPattern.Solid, 0.25, {{-100, 100}, {100, -100}}, 0, 360)}}
-  regexEllipse = re.compile('Ellipse\(([\w ]+), {('+exp_float+'), ('+exp_float+')}, ('+exp_float+'), {(\d+), (\d+), (\d+)}, {(\d+), (\d+), (\d+)}, (\w+.\w+), (\w+.\w+), ('+exp_float+'), {{('+exp_float+'), ('+exp_float+')}, {('+exp_float+'), ('+exp_float+')}}, ('+exp_float+'), ('+exp_float+')')
-
-  # example: Text(true, {0.0, 0.0}, 0, {0, 0, 255}, {0, 0, 0}, LinePattern.Solid, FillPattern.None, 0.25, {{-150, 110}, {150, 70}}, "%name", 0, {-1, -1, -1}, "fontName", {TextStyle.Bold, TextStyle.Italic, TextStyle.UnderLine}, TextAlignment.Center
-  regexText = re.compile('Text\(([\w ]+), {('+exp_float+'), ('+exp_float+')}, ('+exp_float+'), {(\d+), (\d+), (\d+)}, {(\d+), (\d+), (\d+)}, (\w+.\w+), (\w+.\w+), ('+exp_float+'), {{('+exp_float+'), ('+exp_float+')}, {('+exp_float+'), ('+exp_float+')}}, ("[^"]*"), ('+exp_float+'), {([+-]?\d+), ([+-]?\d+), ([+-]?\d+)}, ("[^"]*"), {([^}]*)}, (\w+.\w+)')
-
-  # example: Text(true, {0.0, 0.0}, 0, {0, 0, 255}, {0, 0, 0}, LinePattern.Solid, FillPattern.None, 0.25, {{-150, 110}, {150, 70}}, {"%name", y, 0}, 0, {-1, -1, -1}, "fontName", {TextStyle.Bold, TextStyle.Italic, TextStyle.UnderLine}, TextAlignment.Center
-  regexText2 = re.compile('Text\(([\w ]+), {('+exp_float+'), ('+exp_float+')}, ('+exp_float+'), {(\d+), (\d+), (\d+)}, {(\d+), (\d+), (\d+)}, (\w+.\w+), (\w+.\w+), ('+exp_float+'), {{('+exp_float+'), ('+exp_float+')}, {('+exp_float+'), ('+exp_float+')}}, {("[^"]*"), [+-, \w\d]*}, ('+exp_float+'), {([+-]?\d+), ([+-]?\d+), ([+-]?\d+)}, ("[^"]*"), {([^}]*)}, (\w+.\w+)')
-
-  # example: Polygon(true, {0.0, 0.0}, 0, {0, 127, 255}, {0, 127, 255}, LinePattern.Solid, FillPattern.Solid, 0.25, {{-24, -34}, {-82, 40}, {-72, 46}, {-14, -26}, {-24, -34}}, Smooth.None
-  #   Polygon(true, {-60, -40},90, {0, 0, 0}, {255, 128, 0}, LinePattern.Solid, FillPattern.VerticalCylinder, 0.25, {{-20.0, 10.0}, {0.0, -10.0}, {1.22465e-16, -50.0}, {-10.0, -60.0}, {-20.0, -60.0}, {-20.0, 10.0}}, Smooth.None
-  regexPolygon = re.compile('Polygon\(([\w ]+), {('+exp_float+'), ('+exp_float+')}, ('+exp_float+'), {(\d+), (\d+), (\d+)}, {(\d+), (\d+), (\d+)}, (\w+.\w+), (\w+.\w+), ('+exp_float+'), ({{'+exp_float+'(?:e[+-]?\d+)?, '+exp_float+'(?:e[+-]?\d+)?}(?:, {'+exp_float+', '+exp_float+'})*}), (\w+.\w+)')
-
-  # example: {{-100.0, -100.0}, {-100.0, -30.0}, {0.0, -30.0}, {0.0, 0.0}}
-  regexPoints = re.compile('{('+exp_float+'), ('+exp_float+')}')
-
-  # example: Bitmap(true, {0.0, 0.0}, 0, {{-98, 98}, {98, -98}}, "modelica://Modelica/Resources/Images/Mechanics/MultiBody/Visualizers/TorusIcon.png"
-  regexBitmap = re.compile('Bitmap\(([\w ]+), {('+exp_float+'), ('+exp_float+')}, ('+exp_float+'), {{('+exp_float+'), ('+exp_float+')}, {('+exp_float+'), ('+exp_float+')}}, ("[^"]*")(?:, ("[^"]*"))?')
-
-  # anything unknown that produces output should look like this: Trash(...
-  regexAny = re.compile('(\w+)\(')
-
   iconAnnotation = sendCommand("getIconAnnotation({0})".format(className), parsed=False)
 
   classGraphics = dict()
-  classGraphics['graphics'] = []
-  classGraphics['coordinateSystem'] = {}
-  classGraphics['coordinateSystem']['extent'] = [[-100, -100], [100, 100]]
+  classGraphics["graphics"] = []
+  classGraphics["coordinateSystem"] = {}
+  classGraphics["coordinateSystem"]["extent"] = [[-100, -100], [100, 100]]
+  classGraphics["coordinateSystem"]["preserveAspectRatio"] = True
+  classGraphics["coordinateSystem"]["initialScale"] = 0.1
+  classGraphics["coordinateSystem"]["grid"] = [2, 2]
 
-  shapes = ""
-  coOrdinateSystem = regexCoOrdinateSystem.search(iconAnnotation)
-  if coOrdinateSystem:
-    g = coOrdinateSystem.groups()
-    classGraphics['coordinateSystem']['extent'] = [[float(g[0]), float(g[1])], [float(g[2]), float(g[3])]]
-    classGraphics['coordinateSystem']['preserveAspectRatio'] = bool(g[4])
-    classGraphics['coordinateSystem']['initialScale'] = float(g[5])
-    classGraphics['coordinateSystem']['grid'] = [float(g[6]), float(g[7])]
+  iconAnnotationList = util.getStrings(util.removeFirstLastCurlBrackets(iconAnnotation))
+  if (len(iconAnnotationList) >= 8):
+    classGraphics["coordinateSystem"]["extent"] = [[float(iconAnnotationList[0]), float(iconAnnotationList[1])], [float(iconAnnotationList[2]), float(iconAnnotationList[3])]]
+    classGraphics["coordinateSystem"]["preserveAspectRatio"] = bool(iconAnnotationList[4])
+    if util.isFloat(iconAnnotationList[5]):
+      classGraphics["coordinateSystem"]["initialScale"] = float(iconAnnotationList[5])
+    if util.isFloat(iconAnnotationList[6]) and util.isFloat(iconAnnotationList[7]):
+      classGraphics["coordinateSystem"]["grid"] = [float(iconAnnotationList[6]), float(iconAnnotationList[7])]
 
-    shapes = iconAnnotation[iconAnnotation.find(',{'):]
-  else:
-    shapes = iconAnnotation
+  if (len(iconAnnotationList) < 9):
+    return classGraphics
+  shapes = util.getStrings(util.removeFirstLastCurlBrackets(iconAnnotationList[8]), '(', ')')
 
-  for shape in shapes.split('),'):
-    # default values
+  for shape in shapes:
     graphicsObject = {}
 
-    r = regexLine.search(shape)
-    if r:
-      graphicsObject['type'] = 'Line'
-      g = r.groups()
-      graphicsObject['visible'] = g[0]
-      graphicsObject['origin'] = [float(g[1]), float(g[2])]
-      graphicsObject['rotation'] = float(g[3])
-
+    if shape.startswith("Line"):
+      graphicsObject["type"] = "Line"
+      shape = shape[len("Line"):]
+      shapeList = util.getStrings(util.removeFirstLastParentheses(shape))
+      util.parseGraphicItem(graphicsObject, shapeList)
+      # 4th item of list contains the points.
       points = []
-      gg = re.findall(regexPoints, g[4])
-      for i in range(0, len(gg)):
-        points.append([float(gg[i][0]), float(gg[i][1])])
-      graphicsObject['points'] = points
-
-      graphicsObject['color'] = [int(g[5]), int(g[6]), int(g[7])]
-      graphicsObject['pattern'] = g[8]
-      graphicsObject['thickness'] = float(g[9])
-      graphicsObject['arrow'] = [g[10], g[11]]
-      graphicsObject['arrowSize'] = float(g[12])
-      graphicsObject['smooth'] = g[13]
-
-    r = regexRectangle.search(shape)
-    if r:
-      graphicsObject['type'] = 'Rectangle'
-      g = r.groups()
-      graphicsObject['visible'] = g[0]
-      graphicsObject['origin'] = [float(g[1]), float(g[2])]
-      graphicsObject['rotation'] = float(g[3])
-      graphicsObject['lineColor'] = [int(g[4]), int(g[5]), int(g[6])]
-      graphicsObject['fillColor'] = [int(g[7]), int(g[8]), int(g[9])]
-      graphicsObject['linePattern'] = g[10]
-      graphicsObject['fillPattern'] = g[11]
-      graphicsObject['lineThickness'] = float(g[12])
-      graphicsObject['borderPattern'] = g[13]
-      graphicsObject['extent'] = [[float(g[14]), float(g[15])], [float(g[16]), float(g[17])]]
-      graphicsObject['radius'] = float(g[18])
-
-    r = regexPolygon.search(shape)
-    if r:
-      graphicsObject['type'] = 'Polygon'
-      g = r.groups()
-      graphicsObject['visible'] = g[0]
-      graphicsObject['origin'] = [float(g[1]), float(g[2])]
-      graphicsObject['rotation'] = float(g[3])
-      graphicsObject['lineColor'] = [int(g[4]), int(g[5]), int(g[6])]
-      graphicsObject['fillColor'] = [int(g[7]), int(g[8]), int(g[9])]
-      graphicsObject['linePattern'] = g[10]
-      graphicsObject['fillPattern'] = g[11]
-      graphicsObject['lineThickness'] = float(g[12])
-
+      pointsList = util.getStrings(util.removeFirstLastCurlBrackets(shapeList[3]))
+      for point in pointsList:
+        linePoints = util.getStrings(util.removeFirstLastCurlBrackets(point))
+        points.append([float(linePoints[0]), float(linePoints[1])])
+      graphicsObject["points"] = points
+      # 5th item of list contains the color.
+      colorList = util.getStrings(util.removeFirstLastCurlBrackets(shapeList[4]))
+      graphicsObject["color"] = [int(colorList[0]), int(colorList[1]), int(colorList[2])]
+      # 6th item of list contains the Line Pattern.
+      graphicsObject["pattern"] = shapeList[5]
+      # 7th item of list contains the Line thickness.
+      graphicsObject["thickness"] = float(shapeList[6])
+      # 8th item of list contains the Line Arrows.
+      arrowList = util.getStrings(util.removeFirstLastCurlBrackets(shapeList[7]))
+      graphicsObject["arrow"] = [arrowList[0], arrowList[1]]
+      # 9th item of list contains the Line Arrow Size.
+      graphicsObject["arrowSize"] = float(shapeList[8])
+      # 10th item of list contains the smooth.
+      graphicsObject["smooth"] = shapeList[9]
+    elif shape.startswith("Rectangle"):
+      graphicsObject["type"] = "Rectangle"
+      shape = shape[len("Rectangle"):]
+      shapeList = util.getStrings(util.removeFirstLastParentheses(shape))
+      util.parseGraphicItem(graphicsObject, shapeList)
+      util.parseFilledShape(graphicsObject, shapeList)
+      # 9th item of list contains the border pattern.
+      graphicsObject["borderPattern"] = shapeList[8]
+      # 10th item is the extent points.
+      extentsList = util.getStrings(util.removeFirstLastCurlBrackets(shapeList[9]))
+      extentPoints1 = util.getStrings(util.removeFirstLastCurlBrackets(extentsList[0]))
+      extentPoints2 = util.getStrings(util.removeFirstLastCurlBrackets(extentsList[1]))
+      graphicsObject["extent"] = [[float(extentPoints1[0]), float(extentPoints1[1])], [float(extentPoints2[0]), float(extentPoints2[1])]]
+      # 11th item of the list contains the corner radius.
+      graphicsObject["radius"] = float(shapeList[10])
+    elif shape.startswith("Polygon"):
+      graphicsObject["type"] = "Polygon"
+      shape = shape[len("Polygon"):]
+      shapeList = util.getStrings(util.removeFirstLastParentheses(shape))
+      util.parseGraphicItem(graphicsObject, shapeList)
+      util.parseFilledShape(graphicsObject, shapeList)
+      # 9th item of list contains the points.
       points = []
-      gg = re.findall(regexPoints, g[13])
-      for i in range(0, len(gg)):
-        points.append([float(gg[i][0]), float(gg[i][1])])
-      graphicsObject['points'] = points
-
+      pointsList = util.getStrings(util.removeFirstLastCurlBrackets(shapeList[8]))
+      for point in pointsList:
+        linePoints = util.getStrings(util.removeFirstLastCurlBrackets(point))
+        points.append([float(linePoints[0]), float(linePoints[1])])
+      graphicsObject["points"] = points
       minX = 100
       minY = 100
       maxX = -100
@@ -244,84 +210,75 @@ def getClassGraphics(className):
           maxY = point[1]
 
       graphicsObject['extent'] = [[minX, minY], [maxX, maxY]]
-      graphicsObject['smooth'] = g[14]
-
-    r = regexText.search(shape)
-    if not r:
-      r = regexText2.search(shape)
-    if r:
-      graphicsObject['type'] = 'Text'
-      g = r.groups()
-      graphicsObject['visible'] = g[0]
-      graphicsObject['origin'] = [float(g[1]), float(g[2])]
-      graphicsObject['rotation'] = float(g[3])
-      graphicsObject['lineColor'] = [int(g[4]), int(g[5]), int(g[6])]
-      graphicsObject['fillColor'] = [int(g[7]), int(g[8]), int(g[9])]
-      graphicsObject['linePattern'] = g[10]
-      graphicsObject['fillPattern'] = g[11]
-      graphicsObject['lineThickness'] = float(g[12])
-      graphicsObject['extent'] = [[float(g[13]), float(g[14])], [float(g[15]), float(g[16])]]
-      graphicsObject['textString'] = g[17].strip('"')
-      graphicsObject['fontSize'] = float(g[18])
-      graphicsObject['textColor'] = [int(g[19]), int(g[20]), int(g[21])]
-      graphicsObject['fontName'] = g[22]
-      if graphicsObject['fontName']:
-        graphicsObject['fontName'] = graphicsObject['fontName'].strip('"')
-
-      graphicsObject['textStyle'] = []
-      if g[23]:
-        graphicsObject['textStyle'] = regex_type_value.findall(g[23])  # text Style can have different number of styles
-
-      graphicsObject['horizontalAlignment'] = g[24]
-
-    r = regexEllipse.search(shape)
-    if r:
-      g = r.groups()
-      graphicsObject['type'] = 'Ellipse'
-      graphicsObject['visible'] = g[0]
-      graphicsObject['origin'] = [float(g[1]), float(g[2])]
-      graphicsObject['rotation'] = float(g[3])
-      graphicsObject['lineColor'] = [int(g[4]), int(g[5]), int(g[6])]
-      graphicsObject['fillColor'] = [int(g[7]), int(g[8]), int(g[9])]
-      graphicsObject['linePattern'] = g[10]
-      graphicsObject['fillPattern'] = g[11]
-      graphicsObject['lineThickness'] = float(g[12])
-      graphicsObject['extent'] = [[float(g[13]), float(g[14])], [float(g[15]), float(g[16])]]
-      graphicsObject['startAngle'] = float(g[17])
-      graphicsObject['endAngle'] = float(g[18])
-
-    r = regexBitmap.search(shape)
-    if r:
-      g = r.groups()
-      graphicsObject['type'] = 'Bitmap'
-      graphicsObject['visible'] = g[0]
-      graphicsObject['origin'] = [float(g[1]), float(g[2])]
-      graphicsObject['rotation'] = float(g[3])
-      graphicsObject['extent'] = [[float(g[4]), float(g[5])], [float(g[6]), float(g[7])]]
-      if g[9] is not None:
-        graphicsObject['href'] = "data:image;base64,"+g[9].strip('"')
+      # 10th item of list contains the smooth.
+      graphicsObject["smooth"] = shapeList[9]
+    elif shape.startswith("Text"):
+      graphicsObject["type"] = "Text"
+      shape = shape[len("Text"):]
+      shapeList = util.getStrings(util.removeFirstLastParentheses(shape))
+      util.parseGraphicItem(graphicsObject, shapeList)
+      util.parseFilledShape(graphicsObject, shapeList)
+      # 9th item is the extent points.
+      extentsList = util.getStrings(util.removeFirstLastCurlBrackets(shapeList[8]))
+      extentPoints1 = util.getStrings(util.removeFirstLastCurlBrackets(extentsList[0]))
+      extentPoints2 = util.getStrings(util.removeFirstLastCurlBrackets(extentsList[1]))
+      graphicsObject["extent"] = [[float(extentPoints1[0]), float(extentPoints1[1])], [float(extentPoints2[0]), float(extentPoints2[1])]]
+      # 10th item of the list contains the textString.
+      if (shapeList[9].startswith("{")): # DynamicSelect
+        args = util.getStrings(util.removeFirstLastCurlBrackets(shapeList[9]))
+        graphicsObject["textString"] = args[0].strip('"')
       else:
-        fname = omcproxy.sendCommand("uriToFilename({0})".format(g[8]), parsed=False).strip().strip('"')
+        graphicsObject["textString"] = shapeList[9].strip('"')
+      # 11th item of the list contains the fontSize.
+      graphicsObject["fontSize"] = float(shapeList[10])
+      # 12th item of the list contains the optional textColor, {-1, -1, -1} if not set
+      colorList = util.getStrings(util.removeFirstLastCurlBrackets(shapeList[11]))
+      graphicsObject["textColor"] = [int(colorList[0]), int(colorList[1]), int(colorList[2])]
+      # 13th item of the list contains the font name.
+      graphicsObject["fontName"] = shapeList[12].strip('"')
+      # 14th item of the list contains the text styles.
+      graphicsObject["textStyle"] = util.getStrings(util.removeFirstLastCurlBrackets(shapeList[13]))
+      # 15th item of the list contains the text alignment.
+      graphicsObject["horizontalAlignment"] = shapeList[14]
+    elif shape.startswith("Ellipse"):
+      graphicsObject["type"] = "Ellipse"
+      shape = shape[len("Ellipse"):]
+      shapeList = util.getStrings(util.removeFirstLastParentheses(shape))
+      util.parseGraphicItem(graphicsObject, shapeList)
+      util.parseFilledShape(graphicsObject, shapeList)
+      # 9th item is the extent points.
+      extentsList = util.getStrings(util.removeFirstLastCurlBrackets(shapeList[8]))
+      extentPoints1 = util.getStrings(util.removeFirstLastCurlBrackets(extentsList[0]))
+      extentPoints2 = util.getStrings(util.removeFirstLastCurlBrackets(extentsList[1]))
+      graphicsObject["extent"] = [[float(extentPoints1[0]), float(extentPoints1[1])], [float(extentPoints2[0]), float(extentPoints2[1])]]
+      # 10th item of the list contains the start angle.
+      graphicsObject["startAngle"] = float(shapeList[9])
+      # 11th item of the list contains the end angle.
+      graphicsObject["endAngle"] = float(shapeList[10])
+    elif shape.startswith("Bitmap"):
+      graphicsObject["type"] = "Bitmap"
+      shape = shape[len("Bitmap"):]
+      shapeList = util.getStrings(util.removeFirstLastParentheses(shape))
+      util.parseGraphicItem(graphicsObject, shapeList)
+      # 4th item is the extent points
+      extentsList = util.getStrings(util.removeFirstLastCurlBrackets(shapeList[3]))
+      extentPoints1 = util.getStrings(util.removeFirstLastCurlBrackets(extentsList[0]))
+      extentPoints2 = util.getStrings(util.removeFirstLastCurlBrackets(extentsList[1]))
+      graphicsObject["extent"] = [[float(extentPoints1[0]), float(extentPoints1[1])], [float(extentPoints2[0]), float(extentPoints2[1])]]
+      # 5th item is the fileName
+      # 6th item is the imageSource
+      if (len(shapeList) >= 6):
+        graphicsObject["href"] = "data:image;base64,"+shapeList[5].strip('"')
+      else:
+        fname = omcproxy.sendCommand("uriToFilename({0})".format(shapeList[4]), parsed=False).strip().strip('"')
         if not os.path.exists(fname):
-          fname = os.path.join(baseDir, g[8].strip('"'))
+          fname = os.path.join(baseDir, shapeList[4].strip('"'))
         if os.path.exists(fname):
           with open(fname, "rb") as f_p:
-            graphicsObject['href'] = "data:image;base64,"+str(base64.b64encode(f_p.read()))
+            graphicsObject["href"] = "data:image;base64,"+str(base64.b64encode(f_p.read()))
         else:
-          log.error("Could not find bitmap file {0}".format(g[8]))
-          graphicsObject['href'] = g[8].strip('"')
-
-    if not 'type' in graphicsObject:
-      r = regexAny.search(shape)
-      if r:
-        g = r.groups()
-        graphicsObject['type'] = 'Unknown'
-        log.error('Unknown graphicsObject: {0}'.format(g[0]))
-      elif shape.strip() == '{}': # ignore empty icons
-        graphicsObject['type'] = 'Empty'
-      else: # assume others to be empty as well
-        graphicsObject['type'] = 'Empty'
-        log.info('Treating graphicsObject as empty icon: {0}'.format(shape))
+          log.error("Could not find bitmap file {0}".format(shapeList[4]))
+          graphicsObject["href"] = shapeList[4].strip('"')
 
     classGraphics['graphics'].append(graphicsObject)
 

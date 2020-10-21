@@ -242,3 +242,39 @@ def svgJson(path, width, height):
   json['width'] = width
   json['height'] = height
   return json
+
+def parseGraphicItem(graphicsObject, shapeList):
+  # 1st item is the visible
+  if (shapeList[0].startswith("{")): # DynamicSelect
+    args = getStrings(removeFirstLastCurlBrackets(shapeList[0]))
+    graphicsObject["visible"] = "true" in args[0]
+  else:
+    graphicsObject["visible"] = "true" in shapeList[0]
+  # 2nd item is the origin
+  originList = getStrings(removeFirstLastCurlBrackets(shapeList[1]))
+  graphicsObject["origin"] = [float(originList[0]), float(originList[1])]
+  # 3rd item is the rotation
+  if (shapeList[2].startswith("{")): # DynamicSelect
+    args = getStrings(removeFirstLastCurlBrackets(shapeList[2]))
+    graphicsObject["rotation"] = float(args[0])
+  else:
+    graphicsObject["rotation"] = float(shapeList[2])
+
+def parseFilledShape(graphicsObject, shapeList):
+  # 4th item of list contains the line color.
+  colorList = getStrings(removeFirstLastCurlBrackets(shapeList[3]))
+  graphicsObject["lineColor"] = [int(colorList[0]), int(colorList[1]), int(colorList[2])]
+  # 5th item of list contains the fill color.
+  fillColorList = getStrings(removeFirstLastCurlBrackets(shapeList[4]))
+  graphicsObject["fillColor"] = [int(fillColorList[0]), int(fillColorList[1]), int(fillColorList[2])]
+  # 6th item of list contains the Line Pattern.
+  graphicsObject["linePattern"] = shapeList[5]
+  graphicsObject["fillPattern"] = shapeList[6]
+  graphicsObject["lineThickness"] = float(shapeList[7])
+
+def isFloat(value):
+  try:
+    float(value)
+    return True
+  except ValueError:
+    return False
