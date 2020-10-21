@@ -63,7 +63,6 @@ def getLastWordAfterDot(value):
   return wordsBeforeAfterLastDot(value, True)
 
 def removeFirstLastCurlBrackets(value):
-  print(value)
   value = value.strip()
   if (len(value) > 1 and value[0] == '{' and value[len(value) - 1] == '}'):
     value = value[1: len(value) - 1]
