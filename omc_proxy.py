@@ -160,8 +160,10 @@ def getClassGraphics(className):
 
   iconAnnotationList = util.getStrings(util.removeFirstLastCurlBrackets(iconAnnotation))
   if (len(iconAnnotationList) >= 8):
-    classGraphics["coordinateSystem"]["extent"] = [[float(iconAnnotationList[0]), float(iconAnnotationList[1])], [float(iconAnnotationList[2]), float(iconAnnotationList[3])]]
-    classGraphics["coordinateSystem"]["preserveAspectRatio"] = bool(iconAnnotationList[4])
+    if util.isFloat(iconAnnotationList[0]) and util.isFloat(iconAnnotationList[1]) and util.isFloat(iconAnnotationList[2]) and util.isFloat(iconAnnotationList[3]):
+      classGraphics["coordinateSystem"]["extent"] = [[float(iconAnnotationList[0]), float(iconAnnotationList[1])], [float(iconAnnotationList[2]), float(iconAnnotationList[3])]]
+    if util.isFloat(iconAnnotationList[4]):
+      classGraphics["coordinateSystem"]["preserveAspectRatio"] = bool(iconAnnotationList[4])
     if util.isFloat(iconAnnotationList[5]):
       classGraphics["coordinateSystem"]["initialScale"] = float(iconAnnotationList[5])
     if util.isFloat(iconAnnotationList[6]) and util.isFloat(iconAnnotationList[7]):
