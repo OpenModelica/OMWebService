@@ -40,20 +40,18 @@ log = logging.getLogger(__name__)
 app = Flask(__name__)
 
 def configure_app():
-  app.config['SERVER_NAME'] = settings.FLASK_SERVER_NAME
   logging.basicConfig(level=logging.DEBUG)
 
 def initialize_app():
   configure_app()
 
-  blueprint = Blueprint('api', __name__, url_prefix='/api')
+  blueprint = Blueprint("api", __name__, url_prefix="/api")
   api.api.init_app(blueprint)
   app.register_blueprint(blueprint)
 
 def main():
   initialize_app()
-  log.info('>>>>> Starting development server at http://{0}/api/ <<<<<'.format(app.config['SERVER_NAME']))
-  app.run(debug=settings.FLASK_DEBUG)
+  app.run(host=settings.FLASK_SERVER_NAME, port=settings.FLASK_SERVER_PORT, debug=settings.FLASK_DEBUG)
 
 if __name__ == "__main__":
   main()

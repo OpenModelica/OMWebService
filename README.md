@@ -7,7 +7,9 @@ OpenModelica web service, queries via a REST API
 - [OpenModelica >= 1.16.0](https://openmodelica.org)
 - Required python packages are installed via requirements.txt
 
-## Build instructions
+## Build & Run instructions
+
+### Option 1
 
 Install the dependencies and then run the following commands,
 
@@ -15,6 +17,16 @@ Install the dependencies and then run the following commands,
 $ cd /path/to/OpenModelica/OMWebService
 $ pip install -r requirements.txt
 $ python app.py
+```
+
+### Option 2
+
+Use the Dockerfile provided to run with docker,
+
+```bash
+$ cd /path/to/OpenModelica/OMWebService
+$ docker build . -t openmodelica/omwebservice
+$ docker run --user nobody -p 8080:8080 openmodelica/omwebservice
 ```
 
 In your browser, open the URL http://localhost:8888/api/

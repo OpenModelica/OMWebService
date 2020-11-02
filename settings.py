@@ -31,5 +31,6 @@ See the full OSMC Public License conditions for more details.
 """
 
 # Flask settings
-FLASK_SERVER_NAME = 'localhost:8080'
+FLASK_SERVER_NAME = "0.0.0.0"
+FLASK_SERVER_PORT = "8080"
 FLASK_DEBUG = True  # Do not use debug mode in production
