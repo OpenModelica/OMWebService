@@ -51,6 +51,10 @@ def sendCommand(expression, parsed=True):
 
   return res
 
+# OMC setup commands
+
+sendCommand('setCommandLineOptions("-d=newInst,nfAPI")', True)
+
 if not sendCommand('loadModel(Modelica)', True):
   log.critical('Failed to load Modelica standard library: {0}'.format(omc.sendExpression('getErrorString()')))
 

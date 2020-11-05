@@ -278,3 +278,7 @@ def isFloat(value):
     return True
   except ValueError:
     return False
+
+def nodeToFileName(nodeName):
+  """The file-system dislikes directory separators, * etc."""
+  return nodeName.replace("/","Division").replace("*","Multiplication").replace("<","x3C").replace(">","x3E")

@@ -38,10 +38,16 @@ from flask_restx import reqparse
 from flask_restx import inputs
 import svg_writer
 import flask
+import settings
 
 log = logging.getLogger(__name__)
 
 api = Api(version='1.0', title='OMWebService API', description='OMWebService API Documentation')
+
+@api.errorhandler
+def default_error_handler(error):
+  '''Default error handler'''
+  return {'message': str(error)}, getattr(error, 'code', 500)
 
 @api.route("/version")
 class Version(Resource):
@@ -57,20 +63,24 @@ class LibraryNodes(Resource):
 
   @api.expect(parser)
   def get(self):
-    """Returns the list of library nodes."""
-    args = self.parser.parse_args()
-    nodeName = args["name"]
-    recursive = args["recursive"]
-    sort = util.pythonBoolToModelicaBool(args["sort"])
+    try:
+      """Returns the list of library nodes."""
+      args = self.parser.parse_args()
+      nodeName = args["name"]
+      recursive = args["recursive"]
+      sort = util.pythonBoolToModelicaBool(args["sort"])
 
-    nodesJson = []
-    if nodeName == "AllLoadedClasses":
-      classNames = omc_proxy.sendCommand("getClassNames({0}, false, false, {1}, false, true, false)".format(nodeName, sort))
-      for className in classNames:
-        nodesJson.append(self.getNodeJson(className, recursive, False, sort))
-      return nodesJson
-    else:
-      return self.getNodeJson(nodeName, recursive, True, sort)
+      nodesJson = []
+      if nodeName == "AllLoadedClasses":
+        classNames = omc_proxy.sendCommand("getClassNames({0}, false, false, {1}, false, true, false)".format(nodeName, sort))
+        for className in classNames:
+          nodesJson.append(self.getNodeJson(className, recursive, False, sort))
+        return nodesJson
+      else:
+        return self.getNodeJson(nodeName, recursive, True, sort)
+      
+    except:
+      raise
 
   def getNodeJson(self, nodeName, recursive, topLevel, sort):
     nodeJson = dict()
@@ -84,8 +94,9 @@ class LibraryNodes(Resource):
 
     (iconGraphics, connectors, parameters) = omc_proxy.getIconGraphicsConnectorsAndParameters(nodeName)
 
-    path = "{0}.svg".format(nodeName)
+    path = "{0}.svg".format(util.nodeToFileName(nodeName))
     (width, height) = svg_writer.writeSVG(path, iconGraphics)
+    path = "http://{0}:{1}/api/download/?filePath={2}".format(settings.FLASK_SERVER_NAME, settings.FLASK_SERVER_PORT, path)
     nodeJson['svg'] = util.svgJson(path, width, height)
 
     children = []
