@@ -94,10 +94,10 @@ class LibraryNodes(Resource):
 
     (iconGraphics, connectors, parameters) = omc_proxy.getIconGraphicsConnectorsAndParameters(nodeName)
 
-    path = "{0}.svg".format(util.nodeToFileName(nodeName))
-    (width, height) = svg_writer.writeSVG(path, iconGraphics)
-    path = "http://{0}:{1}/api/download/?filePath={2}".format(settings.FLASK_SERVER_NAME, settings.FLASK_SERVER_PORT, path)
-    nodeJson['svg'] = util.svgJson(path, width, height)
+    fileName = "{0}.svg".format(util.nodeToFileName(nodeName))
+    (width, height) = svg_writer.writeSVG(fileName, iconGraphics)
+    fileName = "http://{0}:{1}/api/download/?filePath={2}".format(settings.FLASK_SERVER_NAME, settings.FLASK_SERVER_PORT, fileName)
+    nodeJson['svg'] = util.svgJson(fileName, width, height)
 
     children = []
     if recursive or topLevel:

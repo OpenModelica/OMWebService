@@ -123,7 +123,7 @@ def consumeChar(value, res, i):
     elif (value[i] == '"'):
       res.append('\"')
     elif (value[i] == '?'):
-      res.append('\?')
+      res.append(r'\?')
     elif (value[i] == '\\'):
       res.append('\\')
     elif (value[i] == 'a'):

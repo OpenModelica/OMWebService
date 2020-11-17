@@ -19,6 +19,8 @@ $ pip install -r requirements.txt
 $ python app.py
 ```
 
+In your browser, open the URL http://localhost:8888/api/
+
 ### Option 2
 
 Use the Dockerfile provided to run with docker,
@@ -29,4 +31,4 @@ $ docker build . -t openmodelica/omwebservice
 $ docker run --user nobody -p 8080:8080 openmodelica/omwebservice
 ```
 
-In your browser, open the URL http://localhost:8888/api/
+In your browser, open the URL http://0.0.0.0:8888/api/
