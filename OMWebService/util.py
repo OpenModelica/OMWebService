@@ -1,42 +1,46 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-__license__ = """
-This file is part of OpenModelica.
-Copyright (c) 1998-CurrentYear, Open Source Modelica Consortium (OSMC),
-c/o Linköpings universitet, Department of Computer and Information Science,
-SE-58183 Linköping, Sweden.
+# This file is part of OpenModelica.
+# Copyright (c) 1998-CurrentYear, Open Source Modelica Consortium (OSMC),
+# c/o Linköpings universitet, Department of Computer and Information Science,
+# SE-58183 Linköping, Sweden.
 
-All rights reserved.
+# All rights reserved.
 
-THIS PROGRAM IS PROVIDED UNDER THE TERMS OF GPL VERSION 3 LICENSE OR
-THIS OSMC PUBLIC LICENSE (OSMC-PL) VERSION 1.2.
-ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS PROGRAM CONSTITUTES
-RECIPIENT'S ACCEPTANCE OF THE OSMC PUBLIC LICENSE OR THE GPL VERSION 3,
-ACCORDING TO RECIPIENTS CHOICE.
+# THIS PROGRAM IS PROVIDED UNDER THE TERMS OF GPL VERSION 3 LICENSE OR
+# THIS OSMC PUBLIC LICENSE (OSMC-PL) VERSION 1.2.
+# ANY USE, REPRODUCTION OR DISTRIBUTION OF THIS PROGRAM CONSTITUTES
+# RECIPIENT'S ACCEPTANCE OF THE OSMC PUBLIC LICENSE OR THE GPL VERSION 3,
+# ACCORDING TO RECIPIENTS CHOICE.
 
-The OpenModelica software and the Open Source Modelica
-Consortium (OSMC) Public License (OSMC-PL) are obtained
-from OSMC, either from the above address,
-from the URLs: http://www.ida.liu.se/projects/OpenModelica or
-http://www.openmodelica.org, and in the OpenModelica distribution.
-GNU version 3 is obtained from: http://www.gnu.org/copyleft/gpl.html.
+# The OpenModelica software and the Open Source Modelica
+# Consortium (OSMC) Public License (OSMC-PL) are obtained
+# from OSMC, either from the above address,
+# from the URLs: http://www.ida.liu.se/projects/OpenModelica or
+# http://www.openmodelica.org, and in the OpenModelica distribution.
+# GNU version 3 is obtained from: http://www.gnu.org/copyleft/gpl.html.
 
-This program is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of  MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE, EXCEPT AS EXPRESSLY SET FORTH
-IN THE BY RECIPIENT SELECTED SUBSIDIARY LICENSE CONDITIONS OF OSMC-PL.
+# This program is distributed WITHOUT ANY WARRANTY; without
+# even the implied warranty of  MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE, EXCEPT AS EXPRESSLY SET FORTH
+# IN THE BY RECIPIENT SELECTED SUBSIDIARY LICENSE CONDITIONS OF OSMC-PL.
 
-See the full OSMC Public License conditions for more details.
+# See the full OSMC Public License conditions for more details.
+
+"""
+Module containing helper functions.
 """
 
 def pythonBoolToModelicaBool(value):
+  """Converts the python bool to Modelica."""
   if value:
     return "true"
   else:
     return "false"
 
 def wordsBeforeAfterLastDot(value, lastWord):
+  """Returns the word before or after dot."""
   if not value:
     return ""
 
@@ -60,21 +64,25 @@ def wordsBeforeAfterLastDot(value, lastWord):
     return value
 
 def getLastWordAfterDot(value):
+  """Returns the last word after dot."""
   return wordsBeforeAfterLastDot(value, True)
 
 def removeFirstLastCurlBrackets(value):
+  """Removes the first and last curl bracket."""
   value = value.strip()
   if (len(value) > 1 and value[0] == '{' and value[len(value) - 1] == '}'):
     value = value[1: len(value) - 1]
   return value
 
 def removeFirstLastParentheses(value):
+  """Removes the first and last parentheses."""
   value = value.strip()
   if (len(value) > 1 and value[0] == '(' and value[len(value) - 1] == ')'):
     value = value[1: len(value) - 1]
   return value
 
 def unparseArrays(value):
+  """Returns the list of arrays."""
   lst = []
   braceopen = 0
   mainbraceopen = 0
@@ -116,36 +124,38 @@ def unparseArrays(value):
   return lst
 
 def consumeChar(value, res, i):
+  """Escapes the characters for use."""
   if value[i] == '\\':
     i+=1
-    if (value[i] == '\''):
+    if value[i] == '\'':
       res.append('\'')
-    elif (value[i] == '"'):
+    elif value[i] == '"':
       res.append('\"')
-    elif (value[i] == '?'):
+    elif value[i] == '?':
       res.append(r'\?')
-    elif (value[i] == '\\'):
+    elif value[i] == '\\':
       res.append('\\')
-    elif (value[i] == 'a'):
+    elif value[i] == 'a':
       res.append('\a')
-    elif (value[i] == 'b'):
+    elif value[i] == 'b':
       res.append('\b')
-    elif (value[i] == 'f'):
+    elif value[i] == 'f':
       res.append('\f')
-    elif (value[i] == 'n'):
+    elif value[i] == 'n':
       res.append('\n')
-    elif (value[i] == 'r'):
+    elif value[i] == 'r':
       res.append('\r')
-    elif (value[i] == 't'):
+    elif value[i] == 't':
       res.append('\t')
-    elif (value[i] == 'v'):
+    elif value[i] == 'v':
       res.append('\v')
   else:
     res.append(value[i])
-  
+
   return res
 
 def unparseStrings(value):
+  """Returns the list of strings."""
   lst = []
   value = value.strip()
   if value[0] != '{':
@@ -178,10 +188,11 @@ def unparseStrings(value):
     while value[i] != '"' and value[i] is not None:
       i+=1
       print("error? malformed string-list. skipping: %c" % value[i])
-  
+
   return lst
 
 def getStrings(value, start='{', end='}'):
+  """Returns the list of strings."""
   lst = []
   mask = False
   inString = False
@@ -189,63 +200,66 @@ def getStrings(value, start='{', end='}'):
   begin = 0
   ele = 0
 
-  for i in range(len(value)):
+  for i, val in enumerate(value):
     if inString:
       if mask:
         mask = False
       else:
-        if value[i] == '\\':
+        if val == '\\':
           mask = True
-        elif value[i] == stringEnd:
+        elif val == stringEnd:
           inString = False
     else:
-      if value[i] == '"':
+      if val == '"':
         stringEnd = '"'
         inString = True
-      elif value[i] == '\'':
+      elif val == '\'':
         stringEnd = '\''
         inString = True
-      elif value[i] == ',':
+      elif val == ',':
         if ele == 0:
           lst.append(value[begin:i].strip())
           begin = i+1
-      elif value[i] == start:
+      elif val == start:
         ele+=1
-      elif value[i] == end:
+      elif val == end:
         ele-=1
 
   lst.append(value[begin:len(value) + 1].strip())
   return lst
 
 def componentPlacement(componentAnnotations):
+  """Creates a placement dictionary from component annotation."""
   placement = dict()
   componentAnnotations = removeFirstLastCurlBrackets(componentAnnotations)
-  annotations = getStrings(componentAnnotations, '(', ')')
+  annotations = getStrings(componentAnnotations, "(", ")")
   for annotation in annotations:
-    if annotation.startswith('Placement'):
-      annotation = annotation[len('Placement'):]
+    if annotation.startswith("Placement"):
+      annotation = annotation[len("Placement"):]
       placementAnnotation = removeFirstLastParentheses(annotation)
-      if placementAnnotation.lower() == 'error':
+      if placementAnnotation.lower() == "error":
         return placement
       else:
         placementAnnotation = getStrings(placementAnnotation)
-        placement['origin'] = {'x': placementAnnotation[1], 'y': placementAnnotation[2]}
-        placement['bottomLeft'] = {'x': placementAnnotation[3], 'y': placementAnnotation[4]}
-        placement['topRight'] = {'x': placementAnnotation[5], 'y': placementAnnotation[6]}
-        placement['rotation'] = placementAnnotation[7]
+        placement["origin"] = {"x": placementAnnotation[1], "y": placementAnnotation[2]}
+        placement["bottomLeft"] = {"x": placementAnnotation[3], "y": placementAnnotation[4]}
+        placement["topRight"] = {"x": placementAnnotation[5], "y": placementAnnotation[6]}
+        placement["rotation"] = placementAnnotation[7]
         return placement
   return placement
 
 def svgJson(path, width, height):
+  """Creates a svg json dictionary from svg attributes."""
   json = dict()
-  json['path'] = path
-  json['width'] = width
-  json['height'] = height
+  json["path"] = path
+  json["width"] = width
+  json["height"] = height
   return json
 
 def parseGraphicItem(graphicsObject, shapeList):
+  """Parses the Graphics item annotation."""
   # 1st item is the visible
-  if (shapeList[0].startswith("{")): # DynamicSelect
+  if shapeList[0].startswith("{"): # DynamicSelect
     args = getStrings(removeFirstLastCurlBrackets(shapeList[0]))
     graphicsObject["visible"] = "true" in args[0]
   else:
@@ -254,13 +268,14 @@ def parseGraphicItem(graphicsObject, shapeList):
   originList = getStrings(removeFirstLastCurlBrackets(shapeList[1]))
   graphicsObject["origin"] = [float(originList[0]), float(originList[1])]
   # 3rd item is the rotation
-  if (shapeList[2].startswith("{")): # DynamicSelect
+  if shapeList[2].startswith("{"): # DynamicSelect
     args = getStrings(removeFirstLastCurlBrackets(shapeList[2]))
     graphicsObject["rotation"] = float(args[0])
   else:
     graphicsObject["rotation"] = float(shapeList[2])
 
 def parseFilledShape(graphicsObject, shapeList):
+  """Parses the Filled shape annotation."""
   # 4th item of list contains the line color.
   colorList = getStrings(removeFirstLastCurlBrackets(shapeList[3]))
   graphicsObject["lineColor"] = [int(colorList[0]), int(colorList[1]), int(colorList[2])]
@@ -273,6 +288,7 @@ def parseFilledShape(graphicsObject, shapeList):
   graphicsObject["lineThickness"] = float(shapeList[7])
 
 def isFloat(value):
+  """Checks if the value is float."""
   try:
     float(value)
     return True

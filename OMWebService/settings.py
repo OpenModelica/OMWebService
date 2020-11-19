@@ -29,5 +29,10 @@
 # See the full OSMC Public License conditions for more details.
 
 """
-Testsuite
+Module for application settings.
 """
+
+# Flask settings
+FLASK_SERVER_NAME = "0.0.0.0"
+FLASK_SERVER_PORT = "8080"
+FLASK_DEBUG = False  # Do not use debug mode in production

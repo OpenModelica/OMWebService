@@ -29,5 +29,29 @@
 # See the full OSMC Public License conditions for more details.
 
 """
-Testsuite
+OMWebService setup script
 """
+
+from setuptools import setup
+
+setup(name="OMWebService",
+      version="1.0.0",
+      description="OpenModelica web service",
+      author="Adeel Asghar",
+      author_email="adeel.asghar@liu.se",
+      maintainer="Adeel Asghar",
+      maintainer_email="adeel.asghar@liu.se",
+      license="BSD, OSMC-PL 1.2, GPL (user's choice)",
+      url="http://openmodelica.org/",
+      packages=["OMWebService"],
+      install_requires=[
+        "flask==1.1.2",
+        "flask-restx==0.2.0",
+        "OMPython",
+        "pylint==2.6.0",
+        "svgwrite==1.4",
+        "numpy==1.19.3",
+        "pytest==6.1.2",
+        "pylint==2.6.0"
+        ]
+      )

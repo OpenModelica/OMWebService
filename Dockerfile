@@ -12,10 +12,9 @@ RUN apt-get update \
   && apt-get install -qy --no-install-recommends omc \
   && apt-get install -qy --no-install-recommends omc omlib-modelica-3.2.2 \
   && rm -rf /var/lib/apt/lists/* \
-  && pip3 install pylint \
-  && pip3 install -r requirements.txt \
+  && python -m pip install -U . \
   && chmod a+rwx -R /app
 
 ENTRYPOINT [ "python3" ]
 
-CMD [ "app.py" ]
+CMD [ "OMWebService/app.py" ]

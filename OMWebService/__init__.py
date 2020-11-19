@@ -29,5 +29,5 @@
 # See the full OSMC Public License conditions for more details.
 
 """
-Testsuite
+OpenModelica web service
 """

@@ -4,8 +4,8 @@ OpenModelica web service, queries via a REST API
 ## Dependencies
 
 - [Python >= 3.8.5](https://www.python.org/)
+- [Python setuptools](https://pypi.org/project/setuptools/)
 - [OpenModelica >= 1.16.0](https://openmodelica.org)
-- Required python packages are installed via requirements.txt
 
 ## Build & Run instructions
 
@@ -15,7 +15,7 @@ Install the dependencies and then run the following commands,
 
 ```bash
 $ cd /path/to/OpenModelica/OMWebService
-$ pip install -r requirements.txt
+$ python -m pip install -U .
 $ python app.py
 ```
 
