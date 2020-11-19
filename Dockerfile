@@ -12,7 +12,7 @@ RUN apt-get update \
   && apt-get install -qy --no-install-recommends omc \
   && apt-get install -qy --no-install-recommends omc omlib-modelica-3.2.2 \
   && rm -rf /var/lib/apt/lists/* \
-  && python -m pip install -U . \
+  && python3 -m pip install -U . \
   && chmod a+rwx -R /app
 
 ENTRYPOINT [ "python3" ]
