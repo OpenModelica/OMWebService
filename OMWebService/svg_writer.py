@@ -276,7 +276,7 @@ def getShapeSvgFromGraphics(dwg, graphics, minX, maxY, elementId, transformation
     if yValue0 > yValue1:
       ymin = yValue1
       ymax = yValue0
-    shape = dwg.image(graphics["href"], xValue=xmin,yValue=ymin,width=xmax-xmin,height=ymax-ymin) # put in correct URL or base64 data "data:image;base64,"
+    shape = dwg.image(graphics["href"], x=xmin,y=ymin,width=xmax-xmin,height=ymax-ymin) # put in correct URL or base64 data "data:image;base64,"
 
   elif graphics["type"] == "Empty":
     return None
@@ -319,7 +319,7 @@ def getShapeSvgFromGraphics(dwg, graphics, minX, maxY, elementId, transformation
         elementId += 1
         shape["filter"] = "url(#" + urlId + ")"
 
-        svgFilter = svgwrite.filters.Filter(id=urlId, filterUnits="objectBoundingBox", xValue="-0.1", yValue="-0.1", width="1.2", height="1.2")
+        svgFilter = svgwrite.filters.Filter(id=urlId, filterUnits="objectBoundingBox", x="-0.1", y="-0.1", width="1.2", height="1.2")
         svgFilter.feGaussianBlur("SourceAlpha", stdDeviation="5", result="alpha_blur")
         feSL = svgFilter.feSpecularLighting("alpha_blur", surfaceScale="5", specularConstant="1", specularExponent="20", lighting_color="#FFFFFF", result="spec_light")
         feSL.fePointLight((-5000, -10000, 10000))

@@ -152,7 +152,7 @@ def consumeChar(value, res, i):
   else:
     res.append(value[i])
 
-  return res
+  return res, i
 
 def unparseStrings(value):
   """Returns the list of strings."""
@@ -165,13 +165,13 @@ def unparseStrings(value):
   while value[i] == '"':
     i+=1
     while value[i] != '"':
-      res = consumeChar(value, res, i)
+      (res, i) = consumeChar(value, res, i)
       i+=1
       # if we have unexpected double quotes then, however omc should return \"
       # remove this block once fixed in omc
       if value[i] == '"' and value[i+1] != ',':
         if value[i+1] != '}':
-          res = consumeChar(value, res, i)
+          (res, i) = consumeChar(value, res, i)
           i+=1
       # remove this block once fixed in omc
     i+=1

@@ -76,6 +76,11 @@ def test_unparseStrings():
   lst = ["x", "y", "z"]
   assert util.unparseStrings("{\"x\", \"y\", \"z\"}") == lst
 
+  lst = ["String", "extraPropertiesNames", "Names of the additional (extra) transported properties. Set extraPropertiesNames=fill(\"\",0) if unused", "public", "false",\
+         "false", "false", "false", "constant", "none", "unspecified", "{:}"]
+  assert util.unparseStrings("{\"String\", \"extraPropertiesNames\", \"Names of the additional (extra) transported properties. Set extraPropertiesNames=fill(\\\"\\\",0) if unused\",\
+                              \"public\", \"false\", \"false\", \"false\", \"false\", \"constant\", \"none\", \"unspecified\", \"{:}\"}") == lst
+
   value = "{\"Modelica.Electrical.Analog.Interfaces.Pin\",\"p\",\"\", \"public\", \"false\", \"false\", \"false\", \"false\", \"unspecified\", \"none\", \"unspecified\",\"{}\"}"
   assert len(util.unparseStrings(value)) == 12
 
