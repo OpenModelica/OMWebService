@@ -29,10 +29,19 @@
 # See the full OSMC Public License conditions for more details.
 
 """
-Module for application settings.
+Module for application configurations.
 """
 
-# Flask settings
-FLASK_SERVER_NAME = "0.0.0.0"
-FLASK_SERVER_PORT = "8080"
-FLASK_DEBUG = False  # Do not use debug mode in production
+class Config:
+  """Base config."""
+  SERVER_NAME = "localhost:8080"
+
+class ProductionConfig(Config):
+  """Production config."""
+  DEBUG = False
+  TESTING = False
+
+class DevelopmentConfig(Config):
+  """Development config."""
+  DEBUG = True
+  TESTING = True

@@ -35,7 +35,7 @@ Api module using the Flask framework.
 import logging
 import flask
 from flask_restx import Resource, Api, reqparse, inputs
-from OMWebService import omc_proxy, util, svg_writer, settings
+from OMWebService import omc_proxy, util, svg_writer
 
 log = logging.getLogger(__name__)
 
@@ -94,8 +94,7 @@ class LibraryNodes(Resource):
 
     fileName = "{0}.svg".format(util.nodeToFileName(nodeName))
     (width, height) = svg_writer.writeSVG(fileName, iconGraphics)
-    fileName = "http://{0}:{1}/api/download/?filePath={2}".format(settings.FLASK_SERVER_NAME, settings.FLASK_SERVER_PORT, fileName)
-    nodeJson["svg"] = util.svgJson(fileName, width, height)
+    nodeJson["svg"] = util.svgJson(util.generateSVGDownloadLink(fileName, flask.current_app.config["SERVER_NAME"]), width, height)
 
     children = []
     if recursive or topLevel:
@@ -104,7 +103,6 @@ class LibraryNodes(Resource):
         children.append(self.getNodeJson("{0}.{1}".format(nodeName, className), recursive, False, sort))
 
     nodeJson["children"] = children
-
     nodeJson["connectors"] = connectors
     nodeJson["parameters"] = parameters
 
@@ -122,4 +120,4 @@ class Download(Resource):
     """Downloads the contents of SVG file."""
     args = self.parser.parse_args()
     filePath = args["filePath"]
-    return flask.send_file(filePath)
+    return flask.send_file("../" + filePath)

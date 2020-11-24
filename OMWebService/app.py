@@ -32,9 +32,10 @@
 Web service application
 """
 
+from os import environ
 import logging
 from flask import Flask, Blueprint
-from OMWebService import api, settings
+from OMWebService import api
 
 log = logging.getLogger(__name__)
 
@@ -43,6 +44,11 @@ app = Flask(__name__)
 def configureApp():
   """Configure the app."""
   logging.basicConfig(level=logging.DEBUG)
+
+  if environ.get("FLASK_ENV") == "development":
+    app.config.from_object('config.DevelopmentConfig')
+  else:
+    app.config.from_object('config.ProductionConfig')
 
 def initializeApp():
   """Initialize the app."""
@@ -55,7 +61,11 @@ def initializeApp():
 def main():
   """web app main entry point."""
   initializeApp()
-  app.run(host=settings.FLASK_SERVER_NAME, port=settings.FLASK_SERVER_PORT, debug=settings.FLASK_DEBUG)
+  dockerApp = environ.get('DOCKER_APP', False)
+  if dockerApp:
+    app.run(host="0.0.0.0", port="8080") # This tells your operating system to listen on all public IPs.
+  else:
+    app.run()
 
 if __name__ == "__main__":
   main()

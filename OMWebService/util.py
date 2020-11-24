@@ -298,3 +298,7 @@ def isFloat(value):
 def nodeToFileName(nodeName):
   """The file-system dislikes directory separators, * etc."""
   return nodeName.replace("/","Division").replace("*","Multiplication").replace("<","x3C").replace(">","x3E")
+
+def generateSVGDownloadLink(fileName, serverName):
+  """Generate the download link for the svg."""
+  return "http://{0}/api/download/?filePath={1}".format(serverName, fileName)

@@ -16,10 +16,8 @@ Install the dependencies and then run the following commands,
 ```bash
 $ cd /path/to/OpenModelica/OMWebService
 $ python -m pip install -U .
-$ python app.py
+$ python OMWebService/app.py
 ```
-
-In your browser, open the URL http://localhost:8888/api/
 
 ### Option 2
 
@@ -31,4 +29,4 @@ $ docker build . -t openmodelica/omwebservice
 $ docker run --user nobody -p 8080:8080 openmodelica/omwebservice
 ```
 
-In your browser, open the URL http://0.0.0.0:8888/api/
+In your browser, open the URL http://localhost:8888/api/

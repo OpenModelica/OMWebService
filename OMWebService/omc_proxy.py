@@ -35,8 +35,9 @@ OpenModelica kernel module. Communicates with OM compiler.
 import os
 import logging
 import base64
+import flask
 from OMPython import OMCSessionZMQ
-from OMWebService import util, svg_writer, settings
+from OMWebService import util, svg_writer
 
 log = logging.getLogger(__name__)
 omc = OMCSessionZMQ()
@@ -76,8 +77,7 @@ def getIconGraphicsConnectorsAndParametersHelper(className, iconGraphics, connec
           component["id"] = componentInfo[0]
           fileName = "{0}.svg".format(util.nodeToFileName(componentInfo[0]))
           (width, height) = svg_writer.writeSVG(fileName, [getClassGraphics(componentInfo[0])])
-          fileName = "http://{0}:{1}/api/download/?filePath={2}".format(settings.FLASK_SERVER_NAME, settings.FLASK_SERVER_PORT, fileName)
-          component["svg"] = util.svgJson(fileName, width, height)
+          component["svg"] = util.svgJson(util.generateSVGDownloadLink(fileName, flask.current_app.config["SERVER_NAME"]), width, height)
           component["placement"] = util.componentPlacement(componentAnnotations[i])
           connectors.append(component)
         elif componentInfo[8] == "parameter":
