@@ -32,22 +32,19 @@
 OpenModelica kernel module. Communicates with OM compiler.
 """
 
-import os
 import logging
-import base64
-import flask
 from OMPython import OMCSessionZMQ
 
 log = logging.getLogger(__name__)
-omc = OMCSessionZMQ()
+omcSession = OMCSessionZMQ()
 
 def sendCommand(expression, parsed=True):
   """Sends the command to OMC."""
   log.debug("sendCommand: %s - parsed: %s", expression, parsed)
 
   try:
-    res = omc.sendExpression(expression, parsed)
-    log.debug("OMC getErrorString(): %s", omc.sendExpression("getErrorString()"))
+    res = omcSession.sendExpression(expression, parsed)
+    log.debug("OMC getErrorString(): %s", omcSession.sendExpression("getErrorString()"))
   except Exception as ex:
     log.error("OMC failed: %s, parsed=%s with exception: %s", expression, parsed, str(ex))
     raise

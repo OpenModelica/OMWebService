@@ -32,10 +32,16 @@
 Api module using the Flask framework.
 """
 
+import os
 import logging
 import flask
+from flask import jsonify
 from flask_restx import Resource, Api, reqparse, inputs
-from Service import omc_proxy
+from Service import omc
+from werkzeug.datastructures import FileStorage
+from werkzeug.utils import secure_filename
+import tempfile
+import zipfile
 
 log = logging.getLogger(__name__)
 
@@ -52,4 +58,68 @@ class Version(Resource):
 
   def get(self):
     """Gets the OpenModelica version"""
-    return omc_proxy.sendCommand("getVersion()")
+    return jsonify({"version": omc.sendCommand("getVersion()")})
+
+@api.route("/simulate")
+class Simulate(Resource):
+  """End point to simulate a model"""
+
+  parser = reqparse.RequestParser()
+  parser.add_argument("Model Name", location = "form", required = True, help = "Name of the model")
+  parser.add_argument("Model Zip File", location = "files", type = FileStorage, required = True, help = "Model zip file")
+
+  allowedExtensions = set(['zip'])
+
+  @api.expect(parser)
+  @api.produces(["application/octet-stream"])
+  def post(self):
+    """Returns the mat simulation result file."""
+    args = self.parser.parse_args()
+    modelName = args["Model Name"]
+    modelZipFile = args["Model Zip File"]
+
+    simulationResultJson = dict()
+
+    # clear everything in omc
+    omc.sendCommand("clear()")
+    if modelZipFile and self.allowedFile(modelZipFile.filename):
+      # save the zip file
+      modelZipFileName = secure_filename(modelZipFile.filename)
+      uploadDirectory = tempfile.mkdtemp()
+      modelZipFilePath = os.path.join(uploadDirectory, modelZipFileName)
+      modelZipFile.save(modelZipFilePath)
+      # unzip the file
+      with zipfile.ZipFile(modelZipFilePath, 'r') as zip_ref:
+        zip_ref.extractall(uploadDirectory)
+      # change working directory
+      omc.sendCommand("cd(\"{0}\")".format(uploadDirectory.replace('\\','/')))
+      # load the model in OMC
+      if omc.sendCommand("loadFile(\"{0}.mo\")".format(os.path.splitext(modelZipFileName)[0])):
+        # simulate the model
+        simulationResult = omc.sendCommand("simulate({0})".format(modelName))
+        if simulationResult["resultFile"]:
+          simulationResultJson["messages"] = simulationResult["messages"]
+          simulationResultJson["resultFile"] = flask.url_for('api.download', fileName="{0}/{1}".format(os.path.basename(uploadDirectory), os.path.basename(simulationResult["resultFile"])))
+          return jsonify(simulationResultJson)
+
+    # if we reach here then some error occurred
+    simulationResultJson["messages"] = "Failed to simulate the model."
+    simulationResultJson["resultFile"] = ""
+    return jsonify(simulationResultJson)
+
+  def allowedFile(self, fileName):
+    return '.' in fileName and fileName.rsplit('.', 1)[1].lower() in self.allowedExtensions
+
+@api.route("/download/", doc=False)
+class Download(Resource):
+  """End point to download the svg file."""
+  parser = reqparse.RequestParser()
+  parser.add_argument("fileName", location = "args", required = True, help = "Path to download SVG file")
+
+  @api.expect(parser)
+  @api.produces(["image/svg+xml"])
+  def get(self):
+    """Downloads the contents of SVG file."""
+    args = self.parser.parse_args()
+    fileName = args["fileName"]
+    return flask.send_file(tempfile.gettempdir() + "/" + fileName)
