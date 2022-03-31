@@ -36,7 +36,7 @@ import os
 import logging
 import flask
 from flask import jsonify
-from flask_restx import Resource, Api, reqparse, inputs
+from flask_restx import Resource, Api, reqparse
 from Service import omc
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
@@ -71,9 +71,8 @@ class Simulate(Resource):
   allowedExtensions = set(['zip'])
 
   @api.expect(parser)
-  @api.produces(["application/octet-stream"])
   def post(self):
-    """Returns the mat simulation result file."""
+    """Simulate the model."""
     args = self.parser.parse_args()
     modelName = args["Model Name"]
     modelZipFile = args["Model Zip File"]
@@ -117,9 +116,9 @@ class Download(Resource):
   parser.add_argument("fileName", location = "args", required = True, help = "Path to download SVG file")
 
   @api.expect(parser)
-  @api.produces(["image/svg+xml"])
+  @api.produces(["application/octet-stream"])
   def get(self):
-    """Downloads the contents of SVG file."""
+    """Downloads the mat simulation result file."""
     args = self.parser.parse_args()
     fileName = args["fileName"]
     return flask.send_file(tempfile.gettempdir() + "/" + fileName)
