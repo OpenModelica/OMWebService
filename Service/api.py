@@ -98,7 +98,7 @@ class Simulate(Resource):
         simulationResult = omc.sendCommand("simulate({0})".format(modelName))
         if simulationResult["resultFile"]:
           simulationResultJson["messages"] = simulationResult["messages"]
-          simulationResultJson["resultFile"] = flask.url_for('api.download', fileName="{0}/{1}".format(os.path.basename(uploadDirectory), os.path.basename(simulationResult["resultFile"])))
+          simulationResultJson["resultFile"] = flask.url_for('api.download', fileName="{0}/{1}".format(os.path.basename(uploadDirectory), os.path.basename(simulationResult["resultFile"])), _external=True)
           return jsonify(simulationResultJson)
 
     # if we reach here then some error occurred

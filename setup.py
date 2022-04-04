@@ -45,7 +45,7 @@ setup(name="OMWebService",
       url="http://openmodelica.org/",
       packages=["Service"],
       install_requires=[
-        "flask==2.1.0",
+        "flask==2.0.3",
         "flask-restx==0.5.1",
         "OMPython"
         ]

@@ -43,12 +43,13 @@ app = Flask(__name__)
 
 def configureApp():
   """Configure the app."""
-  logging.basicConfig(level=logging.DEBUG)
 
   if environ.get("FLASK_ENV") == "development":
     app.config.from_object('config.DevelopmentConfig')
+    logging.basicConfig(level=logging.DEBUG)
   else:
     app.config.from_object('config.ProductionConfig')
+    logging.basicConfig(level=logging.WARNING)
 
 def initializeApp():
   """Initialize the app."""
