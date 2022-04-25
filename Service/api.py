@@ -42,6 +42,7 @@ from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 import tempfile
 import zipfile
+import json
 
 log = logging.getLogger(__name__)
 
@@ -65,8 +66,7 @@ class Simulate(Resource):
   """End point to simulate a model"""
 
   parser = reqparse.RequestParser()
-  parser.add_argument("Model Name", location = "form", required = True, help = "Name of the model")
-  parser.add_argument("Model Zip File", location = "files", type = FileStorage, required = True, help = "Model zip file")
+  parser.add_argument("Zip File", location = "files", type = FileStorage, required = True, help = "Zip file containing the model and simulation information")
 
   allowedExtensions = set(['zip'])
 
@@ -74,8 +74,7 @@ class Simulate(Resource):
   def post(self):
     """Simulate the model."""
     args = self.parser.parse_args()
-    modelName = args["Model Name"]
-    modelZipFile = args["Model Zip File"]
+    modelZipFile = args["Zip File"]
 
     simulationResultJson = dict()
 
@@ -85,26 +84,80 @@ class Simulate(Resource):
       # save the zip file
       modelZipFileName = secure_filename(modelZipFile.filename)
       uploadDirectory = tempfile.mkdtemp()
+      # change working directory
+      omc.sendCommand("cd(\"{0}\")".format(uploadDirectory.replace('\\','/')))
       modelZipFilePath = os.path.join(uploadDirectory, modelZipFileName)
       modelZipFile.save(modelZipFilePath)
       # unzip the file
       with zipfile.ZipFile(modelZipFilePath, 'r') as zip_ref:
         zip_ref.extractall(uploadDirectory)
-      # change working directory
-      omc.sendCommand("cd(\"{0}\")".format(uploadDirectory.replace('\\','/')))
-      # load the model in OMC
-      if omc.sendCommand("loadFile(\"{0}.mo\")".format(os.path.splitext(modelZipFileName)[0])):
-        # simulate the model
-        simulationResult = omc.sendCommand("simulate({0})".format(modelName))
-        if simulationResult["resultFile"]:
-          simulationResultJson["messages"] = simulationResult["messages"]
-          simulationResultJson["resultFile"] = flask.url_for('api.download', fileName="{0}/{1}".format(os.path.basename(uploadDirectory), os.path.basename(simulationResult["resultFile"])), _external=True)
-          return jsonify(simulationResultJson)
+      # read the metadata json if exists
+      try:
+        with open(os.path.join(uploadDirectory, "metadata.json")) as metaDataJsonFilePath:
+          metaDataJson = json.load(metaDataJsonFilePath)
+          libs = metaDataJson.get("libs", [])
+          for lib in libs:
+            name = lib.get("name", "")
+            version = lib.get("version", "")
+            if not omc.sendCommand("installPackage({0}, \"{1}\")".format(name, version)):
+              simulationResultJson["messages"] = "Failed to install package {0}.".format(name)
+              simulationResultJson["resultFile"] = ""
+              return jsonify(simulationResultJson)
+            if not omc.sendCommand("loadModel({0}, {{\"{1}\"}})".format(name, version)):
+              simulationResultJson["messages"] = "Failed to load package {0}.".format(name)
+              simulationResultJson["resultFile"] = ""
+              return jsonify(simulationResultJson)
 
-    # if we reach here then some error occurred
-    simulationResultJson["messages"] = "Failed to simulate the model."
-    simulationResultJson["resultFile"] = ""
-    return jsonify(simulationResultJson)
+          # load the model in OMC
+          fileName = metaDataJson.get("file", "")
+          if fileName:
+            if not omc.sendCommand("loadFile(\"{0}\")".format(fileName)):
+              simulationResultJson["messages"] = "Failed to load the model file. {0}".format(omc.sendCommand("getErrorString()"))
+              simulationResultJson["resultFile"] = ""
+              return jsonify(simulationResultJson)
+
+          # simulate the model
+          className = metaDataJson.get("class", "")
+          if className:
+            simulationArguments = []
+            if "startTime" in metaDataJson:
+              simulationArguments.append("startTime={0}".format(metaDataJson["startTime"]))
+            if "stopTime" in metaDataJson:
+              simulationArguments.append("stopTime={0}".format(metaDataJson["stopTime"]))
+            if "numberOfIntervals" in metaDataJson:
+              simulationArguments.append("numberOfIntervals={0}".format(metaDataJson["numberOfIntervals"]))
+            if "tolerance" in metaDataJson:
+              simulationArguments.append("tolerance={0}".format(metaDataJson["tolerance"]))
+            if "method" in metaDataJson:
+              simulationArguments.append("method=\"{0}\"".format(metaDataJson["method"]))
+            if "fileNamePrefix" in metaDataJson:
+              simulationArguments.append("fileNamePrefix=\"{0}\"".format(metaDataJson["fileNamePrefix"]))
+            if "options" in metaDataJson:
+              simulationArguments.append("options=\"{0}\"".format(metaDataJson["options"]))
+            if "variableFilter" in metaDataJson:
+              simulationArguments.append("variableFilter=\"{0}\"".format(metaDataJson["variableFilter"]))
+            if "cflags" in metaDataJson:
+              simulationArguments.append("cflags=\"{0}\"".format(metaDataJson["cflags"]))
+            if "simflags" in metaDataJson:
+              simulationArguments.append("simflags=\"{0}\"".format(metaDataJson["simflags"]))
+
+            simulationArgumentsStr = ", ".join(simulationArguments)
+            if simulationArgumentsStr:
+              simulationArgumentsStr = ", " + simulationArgumentsStr
+
+            simulationResult = omc.sendCommand("simulate({0}{1})".format(className, simulationArgumentsStr))
+            simulationResultJson["messages"] = simulationResult["messages"]
+            if simulationResult["resultFile"]:
+              simulationResultJson["resultFile"] = flask.url_for('api.download', FileName="{0}/{1}".format(os.path.basename(uploadDirectory), os.path.basename(simulationResult["resultFile"])), _external=True)
+            else:
+              simulationResultJson["resultFile"] = ""
+            return jsonify(simulationResultJson)
+
+      # json file not found exception
+      except FileNotFoundError:
+        simulationResultJson["messages"] = "The metadata.json file is missing."
+        simulationResultJson["resultFile"] = ""
+        return jsonify(simulationResultJson)
 
   def allowedFile(self, fileName):
     return '.' in fileName and fileName.rsplit('.', 1)[1].lower() in self.allowedExtensions
@@ -113,12 +166,12 @@ class Simulate(Resource):
 class Download(Resource):
   """End point to download the svg file."""
   parser = reqparse.RequestParser()
-  parser.add_argument("fileName", location = "args", required = True, help = "Path to download SVG file")
+  parser.add_argument("FileName", location = "args", required = True, help = "Path to download SVG file")
 
   @api.expect(parser)
   @api.produces(["application/octet-stream"])
   def get(self):
     """Downloads the mat simulation result file."""
     args = self.parser.parse_args()
-    fileName = args["fileName"]
+    fileName = args["FileName"]
     return flask.send_file(tempfile.gettempdir() + "/" + fileName)

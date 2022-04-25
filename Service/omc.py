@@ -40,11 +40,11 @@ omcSession = OMCSessionZMQ()
 
 def sendCommand(expression, parsed=True):
   """Sends the command to OMC."""
-  log.debug("sendCommand: %s - parsed: %s", expression, parsed)
+  log.debug("OMC sendCommand: %s - parsed: %s", expression, parsed)
 
   try:
     res = omcSession.sendExpression(expression, parsed)
-    log.debug("OMC getErrorString(): %s", omcSession.sendExpression("getErrorString()"))
+    log.debug("OMC result: %s", res)
   except Exception as ex:
     log.error("OMC failed: %s, parsed=%s with exception: %s", expression, parsed, str(ex))
     raise
