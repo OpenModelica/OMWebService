@@ -37,16 +37,19 @@ from OMPython import OMCSessionZMQ
 
 log = logging.getLogger(__name__)
 omcSession = OMCSessionZMQ()
+errorString = ""
 
 def sendCommand(expression, parsed=True):
   """Sends the command to OMC."""
-  log.debug("OMC sendCommand: %s - parsed: %s", expression, parsed)
+  log.debug("OMC sendCommand: {0} - parsed: {1}".format(expression, parsed))
 
   try:
     res = omcSession.sendExpression(expression, parsed)
-    log.debug("OMC result: %s", res)
+    log.debug("OMC result: {0}".format(res))
+    errorString = omcSession.sendExpression("getErrorString()")
+    log.debug("OMC getErrorString(): {0}".format(errorString))
   except Exception as ex:
-    log.error("OMC failed: %s, parsed=%s with exception: %s", expression, parsed, str(ex))
+    log.error("OMC failed: {0}, parsed={1} with exception: {2}".format(expression, parsed, str(ex)))
     raise
 
   return res

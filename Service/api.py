@@ -109,10 +109,10 @@ class Simulate(Resource):
               return jsonify(simulationResultJson)
 
           # load the model in OMC
-          fileName = metaDataJson.get("file", "")
-          if fileName:
+          fileNames = metaDataJson.get("fileNames", [])
+          for fileName in fileNames:
             if not omc.sendCommand("loadFile(\"{0}\")".format(fileName)):
-              simulationResultJson["messages"] = "Failed to load the model file. {0}".format(omc.sendCommand("getErrorString()"))
+              simulationResultJson["messages"] = "Failed to load the model file {0}. {1}".format(fileName, omc.errorString)
               simulationResultJson["resultFile"] = ""
               return jsonify(simulationResultJson)
 
