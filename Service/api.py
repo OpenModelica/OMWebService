@@ -95,6 +95,16 @@ class Simulate(Resource):
       try:
         with open(os.path.join(uploadDirectory, "metadata.json")) as metaDataJsonFilePath:
           metaDataJson = json.load(metaDataJsonFilePath)
+
+          # load the model in OMC
+          fileNames = metaDataJson.get("fileNames", [])
+          for fileName in fileNames:
+            if not omc.sendCommand("loadFile(\"{0}\")".format(fileName)):
+              simulationResultJson["messages"] = "Failed to load the model file {0}. {1}".format(fileName, omc.errorString)
+              simulationResultJson["resultFile"] = ""
+              return jsonify(simulationResultJson)
+
+          # load the libs
           libs = metaDataJson.get("libs", [])
           for lib in libs:
             name = lib.get("name", "")
@@ -108,49 +118,69 @@ class Simulate(Resource):
               simulationResultJson["resultFile"] = ""
               return jsonify(simulationResultJson)
 
-          # load the model in OMC
-          fileNames = metaDataJson.get("fileNames", [])
-          for fileName in fileNames:
-            if not omc.sendCommand("loadFile(\"{0}\")".format(fileName)):
-              simulationResultJson["messages"] = "Failed to load the model file {0}. {1}".format(fileName, omc.errorString)
-              simulationResultJson["resultFile"] = ""
-              return jsonify(simulationResultJson)
-
           # simulate the model
           className = metaDataJson.get("class", "")
           if className:
             simulationArguments = []
-            if "startTime" in metaDataJson:
-              simulationArguments.append("startTime={0}".format(metaDataJson["startTime"]))
-            if "stopTime" in metaDataJson:
-              simulationArguments.append("stopTime={0}".format(metaDataJson["stopTime"]))
-            if "numberOfIntervals" in metaDataJson:
-              simulationArguments.append("numberOfIntervals={0}".format(metaDataJson["numberOfIntervals"]))
-            if "tolerance" in metaDataJson:
-              simulationArguments.append("tolerance={0}".format(metaDataJson["tolerance"]))
-            if "method" in metaDataJson:
-              simulationArguments.append("method=\"{0}\"".format(metaDataJson["method"]))
             if "fileNamePrefix" in metaDataJson:
               simulationArguments.append("fileNamePrefix=\"{0}\"".format(metaDataJson["fileNamePrefix"]))
-            if "options" in metaDataJson:
-              simulationArguments.append("options=\"{0}\"".format(metaDataJson["options"]))
-            if "variableFilter" in metaDataJson:
-              simulationArguments.append("variableFilter=\"{0}\"".format(metaDataJson["variableFilter"]))
-            if "cflags" in metaDataJson:
-              simulationArguments.append("cflags=\"{0}\"".format(metaDataJson["cflags"]))
-            if "simflags" in metaDataJson:
-              simulationArguments.append("simflags=\"{0}\"".format(metaDataJson["simflags"]))
+
+            outputFormat = metaDataJson.get("outputFormat", "mat")
+            if outputFormat.casefold() == "fmu":
+              if "fmuVersion" in metaDataJson:
+                simulationArguments.append("version={0}".format(metaDataJson["fmuVersion"]))
+              if "fmuType" in metaDataJson:
+                simulationArguments.append("fmuType={0}".format(metaDataJson["fmuType"]))
+              if "platforms" in metaDataJson:
+                platforms = []
+                platformsJson = metaDataJson.get("platforms", [])
+                for platform in platformsJson:
+                  platforms.append("\"{0}\"".format(platform))
+                simulationArguments.append("platforms={{{0}}}".format(", ".join(platforms)))
+              if "includeResources" in metaDataJson:
+                simulationArguments.append("includeResources={0}".format(metaDataJson["includeResources"]))
+            else:
+              if "startTime" in metaDataJson:
+                simulationArguments.append("startTime={0}".format(metaDataJson["startTime"]))
+              if "stopTime" in metaDataJson:
+                simulationArguments.append("stopTime={0}".format(metaDataJson["stopTime"]))
+              if "numberOfIntervals" in metaDataJson:
+                simulationArguments.append("numberOfIntervals={0}".format(metaDataJson["numberOfIntervals"]))
+              if "tolerance" in metaDataJson:
+                simulationArguments.append("tolerance={0}".format(metaDataJson["tolerance"]))
+              if "method" in metaDataJson:
+                simulationArguments.append("method=\"{0}\"".format(metaDataJson["method"]))
+              if "options" in metaDataJson:
+                simulationArguments.append("options=\"{0}\"".format(metaDataJson["options"]))
+              if outputFormat.casefold() == "mat" or outputFormat.casefold() == "csv":
+                simulationArguments.append("outputFormat=\"{0}\"".format(outputFormat))
+              if "variableFilter" in metaDataJson:
+                simulationArguments.append("variableFilter=\"{0}\"".format(metaDataJson["variableFilter"]))
+              if "cflags" in metaDataJson:
+                simulationArguments.append("cflags=\"{0}\"".format(metaDataJson["cflags"]))
+              if "simflags" in metaDataJson:
+                simulationArguments.append("simflags=\"{0}\"".format(metaDataJson["simflags"]))
 
             simulationArgumentsStr = ", ".join(simulationArguments)
             if simulationArgumentsStr:
               simulationArgumentsStr = ", " + simulationArgumentsStr
 
-            simulationResult = omc.sendCommand("simulate({0}{1})".format(className, simulationArgumentsStr))
-            simulationResultJson["messages"] = simulationResult["messages"]
-            if simulationResult["resultFile"]:
-              simulationResultJson["resultFile"] = flask.url_for('api.download', FileName="{0}/{1}".format(os.path.basename(uploadDirectory), os.path.basename(simulationResult["resultFile"])), _external=True)
+            if outputFormat.casefold() == "fmu":
+              simulationResult = omc.sendCommand("buildModelFMU({0}{1})".format(className, simulationArgumentsStr))
+              if simulationResult:
+                simulationResultJson["messages"] = "FMU is generated."
+                simulationResultJson["resultFile"] = flask.url_for('api.download', FileName="{0}/{1}".format(os.path.basename(uploadDirectory), os.path.basename(simulationResult)), _external=True)
+              else:
+                simulationResultJson["messages"] = ""
+                simulationResultJson["resultFile"] = ""
             else:
-              simulationResultJson["resultFile"] = ""
+              simulationResult = omc.sendCommand("simulate({0}{1})".format(className, simulationArgumentsStr))
+              simulationResultJson["messages"] = simulationResult["messages"]
+              if simulationResult["resultFile"]:
+                simulationResultJson["resultFile"] = flask.url_for('api.download', FileName="{0}/{1}".format(os.path.basename(uploadDirectory), os.path.basename(simulationResult["resultFile"])), _external=True)
+              else:
+                simulationResultJson["resultFile"] = ""
+
             return jsonify(simulationResultJson)
 
       # json file not found exception
