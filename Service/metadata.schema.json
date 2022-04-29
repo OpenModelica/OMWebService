@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "A representation of simulation information",
+  "type": "object",
+  "properties": {
+    "fileNames": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "description": "The file to load. The file name is relative to zip root."
+        }
+      ]
+    },
+    "class": {
+      "type": "string",
+      "description": "Class to simulate"
+    },
+    "startTime": {
+      "type": "number"
+    },
+    "stopTime": {
+      "type": "number"
+    },
+    "numberOfIntervals": {
+      "type": "number"
+    },
+    "tolerance": {
+      "type": "number"
+    },
+    "fileNamePrefix": {
+      "type": "string"
+    },
+    "options": {
+      "type": "string"
+    },
+    "outputFormat": {
+      "type": "string",
+      "default": "mat",
+      "description": "Possible values are mat, csv and fmu."
+    },
+    "variableFilter": {
+      "type": "string"
+    },
+    "cflags": {
+      "type": "string"
+    },
+    "simflags": {
+      "type": "string"
+    },
+    "platforms": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "fmuVersion": {
+      "type": "string"
+    },
+    "fmuType": {
+      "type": "string"
+    },
+    "includeResources": {
+      "type": "boolean"
+    },
+    "libs": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Name of the library to install and load."
+            },
+            "version": {
+              "type": "string",
+              "description": "Version of the library to install and load."
+            }
+          },
+          "required": [
+            "name",
+            "version"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "class"
+  ]
+}
