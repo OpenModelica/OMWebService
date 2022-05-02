@@ -53,3 +53,10 @@ def sendCommand(expression, parsed=True):
     raise
 
   return res
+
+def pythonBoolToModelicaBool(value):
+  """Converts the python bool to Modelica."""
+  if value:
+    return "true"
+  else:
+    return "false"
