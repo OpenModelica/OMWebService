@@ -29,39 +29,21 @@
 # See the full OSMC Public License conditions for more details.
 
 """
-Web service application
+Tests the simulate endpoint with BouncingBall file.
 """
 
-from os import environ
-import logging
-from flask import Flask, Blueprint
-from Service import api
+from pathlib import Path
 
-log = logging.getLogger(__name__)
+# get the resources folder in the tests folder
+resources = Path(__file__).parent / "resources"
 
-app = Flask(__name__)
-blueprint = Blueprint("api", __name__, url_prefix="/api")
-api.api.init_app(blueprint)
-app.register_blueprint(blueprint)
-
-def configureApp():
-  """Configure the app."""
-
-  if environ.get("FLASK_ENV") == "development":
-    app.config.from_object('config.DevelopmentConfig')
-    logging.basicConfig(level=logging.DEBUG)
-  else:
-    app.config.from_object('config.ProductionConfig')
-    logging.basicConfig(level=logging.WARNING)
-
-def main():
-  """web app main entry point."""
-  configureApp()
-  dockerApp = environ.get('DOCKER_APP', False)
-  if dockerApp:
-    app.run(host="0.0.0.0", port="8080") # This tells your operating system to listen on all public IPs.
-  else:
-    app.run()
-
-if __name__ == "__main__":
-  main()
+def test_simulate(client):
+  response = client.post("/api/simulate", data = {
+    "Zip File": (resources / "FileSimulation.zip").open("rb")
+  })
+  assert response.status_code == 200
+  data = response.json
+  file = data.get("file", "")
+  if not file:
+    print(data.get("messages", ""))
+    assert False
