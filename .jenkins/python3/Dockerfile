@@ -8,4 +8,7 @@ RUN apt-get update \
   && apt-get install -qy --no-install-recommends omc \
   && rm -rf /var/lib/apt/lists/*
 
+RUN HOME="$PWD" \
+    && python3 -m pip3 install --no-cache -U .
+
 RUN pip3 install --no-cache pytest psutil

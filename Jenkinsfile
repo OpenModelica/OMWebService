@@ -13,7 +13,6 @@ pipeline {
               def dockergid = sh (script: 'stat -c %g /var/run/docker.sock', returnStdout: true).trim()
               sh "docker pull openmodelica/openmodelica:v1.18.0-minimal" // Avoid timeout
               deps.inside("-v /var/run/docker.sock:/var/run/docker.sock --network=host --pid=host --group-add '${dockergid}'") {
-                sh 'HOME="$PWD" python3 -m pip3 install --no-cache -U .'
                 timeout(3) {
                   sh label: 'RunTests', script: '''
                   testsResultsDir="$PWD/testsResults"
