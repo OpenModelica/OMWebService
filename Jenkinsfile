@@ -17,6 +17,7 @@ pipeline {
             sh '''
             export HOME="$PWD"
             testsResultsDir="$PWD/testsResults"
+            mkdir testsResultsDir
             ORIGINAL_TEMP=$TEMP
             ORIGINAL_TMP=$TMP
             ORIGINAL_TMPDIR=$TMPDIR
