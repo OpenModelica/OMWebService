@@ -7,4 +7,5 @@ RUN apt-get update \
   && apt-get update \
   && apt-get install -qy --no-install-recommends omc \
   && rm -rf /var/lib/apt/lists/*
+RUN python3 -m pip --no-cache install -U .
 RUN pip3 install --no-cache pytest psutil

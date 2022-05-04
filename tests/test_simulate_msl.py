@@ -45,5 +45,5 @@ def test_simulate(client):
   data = response.json
   file = data.get("file", "")
   if not file:
-    print(data.get("messages", ""))
+    print(data)
     assert False
