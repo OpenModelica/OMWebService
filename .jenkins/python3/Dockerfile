@@ -1,6 +1,8 @@
 FROM docker.openmodelica.org/build-deps
 
-COPY ../../. /app
+RUN pwd
+
+COPY . /app
 
 WORKDIR /app
 
