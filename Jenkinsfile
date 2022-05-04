@@ -14,6 +14,7 @@ pipeline {
               sh "docker pull openmodelica/openmodelica:v1.18.0-minimal" // Avoid timeout
               deps.inside("-v /var/run/docker.sock:/var/run/docker.sock --network=host --pid=host --group-add '${dockergid}'") {
                 sh 'python3 setup.py build'
+                sh 'HOME="$PWD" python3 setup.py install --user'
                 timeout(3) {
                   sh label: 'RunTests', script: '''
                   testsResultsDir="$PWD/testsResults"
@@ -30,7 +31,6 @@ pipeline {
                   rm -rf $testsResultsDir
                   '''
                 }
-                sh 'HOME="$PWD" python3 setup.py install --user'
               }
               junit 'py3.xml'
             }
