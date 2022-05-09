@@ -35,10 +35,12 @@ Tests the model instance endpoint with Modelica.Electrical.Analog.Examples.ChuaC
 from pathlib import Path
 import tempfile
 import shutil
+import pytest
 
 # get the resources folder in the tests folder
 resources = Path(__file__).parent / "resources"
 
+@pytest.mark.skip(reason="getModeInstance API is missing in the docker image.")
 def test_simulate(application):
   application.config.update({
     "TMPDIR": tempfile.mkdtemp(prefix='test_model_instance_msl')
