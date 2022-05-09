@@ -45,7 +45,7 @@ def test_simulate(application):
   })
 
   response = application.test_client().post("/api/simulate", data = {
-    "Zip File": (resources / "MSLSimulation.zip").open("rb")
+    "MetadataJson": (resources / "MSLSimulation.metadata.json").open("rb")
   })
   assert response.status_code == 200
   data = response.json

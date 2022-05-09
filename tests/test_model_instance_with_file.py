@@ -29,24 +29,26 @@
 # See the full OSMC Public License conditions for more details.
 
 """
-Tests the simulate endpoint with BouncingBall file.
+Tests the model instance endpoint with BouncingBall file.
 """
 
 from pathlib import Path
 import tempfile
 import shutil
+import pytest
 
 # get the resources folder in the tests folder
 resources = Path(__file__).parent / "resources"
 
+@pytest.mark.skip(reason="getModeInstance API is missing in the docker image.")
 def test_simulate(application):
   application.config.update({
-    "TMPDIR": tempfile.mkdtemp(prefix='test_simulate_with_file')
+    "TMPDIR": tempfile.mkdtemp(prefix='test_model_instance_with_file')
   })
 
-  response = application.test_client().post("/api/simulate", data = {
-    "MetadataJson": (resources / "FileSimulation.metadata.json").open("rb"),
-    "ModelZip": (resources / "FileSimulation.zip").open("rb")
+  response = application.test_client().post("/api/modelInstance", data = {
+    "MetadataJson": (resources / "FileModelInstance.metadata.json").open("rb"),
+    "ModelZip": (resources / "FileModelInstance.zip").open("rb")
   })
   assert response.status_code == 200
   data = response.json

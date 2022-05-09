@@ -1,0 +1,12 @@
+{
+  "fileNames": [],
+  "class":"Modelica.Electrical.Analog.Examples.ChuaCircuit",
+  "outputFormat":"fmu",
+  "platforms":["static"],
+  "libs": [
+    {
+      "name":"Modelica",
+      "version":"4.0.0"
+    }
+  ]
+}

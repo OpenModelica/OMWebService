@@ -1,0 +1,10 @@
+{
+  "fileNames": [],
+  "class":"Modelica.Electrical.Analog.Examples.ChuaCircuit",
+  "libs": [
+    {
+      "name":"Modelica",
+      "version":"4.0.0"
+    }
+  ]
+}
