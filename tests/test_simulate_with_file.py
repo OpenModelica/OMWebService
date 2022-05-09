@@ -29,43 +29,30 @@
 # See the full OSMC Public License conditions for more details.
 
 """
-Web service application
+Tests the simulate endpoint with BouncingBall file.
 """
 
-import os
-import logging
-from flask import Flask, Blueprint
-from Service import api
+from pathlib import Path
+import tempfile
+import shutil
 
-log = logging.getLogger(__name__)
+# get the resources folder in the tests folder
+resources = Path(__file__).parent / "resources"
 
-def createApp():
-  """Create the Flask app."""
-  app = Flask(__name__)
-  blueprint = Blueprint("api", __name__, url_prefix="/api")
-  api.api.init_app(blueprint)
-  app.register_blueprint(blueprint)
+def test_simulate(application):
+  application.config.update({
+    "TMPDIR": tempfile.mkdtemp(prefix='test_simulate_with_file')
+  })
 
-  if os.environ.get("FLASK_ENV") == "development":
-    app.config.from_object('config.DevelopmentConfig')
-    logging.basicConfig(level=logging.DEBUG)
-  else:
-    app.config.from_object('config.ProductionConfig')
-    logging.basicConfig(level=logging.WARNING)
+  response = application.test_client().post("/api/simulate", data = {
+    "Zip File": (resources / "FileSimulation.zip").open("rb")
+  })
+  assert response.status_code == 200
+  data = response.json
+  file = data.get("file", "")
+  if not file:
+    print(data)
+    assert False
 
-  if not os.path.exists(app.config['TMPDIR']):
-    os.makedirs(app.config['TMPDIR'])
-
-  return app
-
-def main():
-  """web app main entry point."""
-  app = createApp()
-  dockerApp = os.environ.get('DOCKER_APP', False)
-  if dockerApp:
-    app.run(host="0.0.0.0", port="8080") # This tells your operating system to listen on all public IPs.
-  else:
-    app.run()
-
-if __name__ == "__main__":
-  main()
+  # cleanup
+  shutil.rmtree(application.config['TMPDIR'], ignore_errors=True)

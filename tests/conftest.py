@@ -28,20 +28,14 @@
 
 # See the full OSMC Public License conditions for more details.
 
-"""
-Module for application configurations.
-"""
+import pytest
+from Service import app
 
-class Config:
-  """Base config."""
-  SERVER_NAME = "localhost:8080"
-
-class ProductionConfig(Config):
-  """Production config."""
-  DEBUG = False
-  TESTING = False
-
-class DevelopmentConfig(Config):
-  """Development config."""
-  DEBUG = True
-  TESTING = True
+@pytest.fixture
+def application():
+  app_ = app.createApp()
+  # always set TESTING to true for tests
+  app_.config.update({
+    "TESTING": True
+  })
+  yield app_

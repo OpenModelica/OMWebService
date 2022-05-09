@@ -29,43 +29,5 @@
 # See the full OSMC Public License conditions for more details.
 
 """
-Web service application
+OMWebService Testing
 """
-
-import os
-import logging
-from flask import Flask, Blueprint
-from Service import api
-
-log = logging.getLogger(__name__)
-
-def createApp():
-  """Create the Flask app."""
-  app = Flask(__name__)
-  blueprint = Blueprint("api", __name__, url_prefix="/api")
-  api.api.init_app(blueprint)
-  app.register_blueprint(blueprint)
-
-  if os.environ.get("FLASK_ENV") == "development":
-    app.config.from_object('config.DevelopmentConfig')
-    logging.basicConfig(level=logging.DEBUG)
-  else:
-    app.config.from_object('config.ProductionConfig')
-    logging.basicConfig(level=logging.WARNING)
-
-  if not os.path.exists(app.config['TMPDIR']):
-    os.makedirs(app.config['TMPDIR'])
-
-  return app
-
-def main():
-  """web app main entry point."""
-  app = createApp()
-  dockerApp = os.environ.get('DOCKER_APP', False)
-  if dockerApp:
-    app.run(host="0.0.0.0", port="8080") # This tells your operating system to listen on all public IPs.
-  else:
-    app.run()
-
-if __name__ == "__main__":
-  main()
