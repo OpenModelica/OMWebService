@@ -32,9 +32,12 @@
 Module for application configurations.
 """
 
+import tempfile
+
 class Config:
   """Base config."""
   SERVER_NAME = "localhost:8080"
+  TMPDIR = tempfile.gettempdir() + "/OMWebService"
 
 class ProductionConfig(Config):
   """Production config."""

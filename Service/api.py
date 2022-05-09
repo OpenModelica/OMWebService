@@ -35,9 +35,10 @@ Api module using the Flask framework.
 import os
 import logging
 import flask
-from flask import jsonify
+from flask import current_app, jsonify
 from flask_restx import Resource, Api, reqparse
-from Service import omc
+from Service.omc import OMC
+from Service import util
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 import tempfile
@@ -64,7 +65,10 @@ class Version(Resource):
 
   def get(self):
     """Gets the OpenModelica version"""
-    return jsonify({"version": omc.sendCommand("getVersion()")})
+    omc = OMC()
+    version = omc.sendCommand("getVersion()")
+    omc.sendCommand("quit()")
+    return jsonify({"version": version})
 
 @api.route("/simulate")
 class Simulate(Resource):
@@ -82,11 +86,12 @@ class Simulate(Resource):
     resultJson = dict()
 
     # clear everything in omc
-    omc.sendCommand("clear()")
+    omc = OMC()
+    originalDir = omc.sendCommand("cd()")
     if modelZipFile and allowedFile(modelZipFile.filename):
       # save the zip file
       modelZipFileName = secure_filename(modelZipFile.filename)
-      uploadDirectory = tempfile.mkdtemp()
+      uploadDirectory = tempfile.mkdtemp(dir=current_app.config['TMPDIR'])
       # change working directory
       omc.sendCommand("cd(\"{0}\")".format(uploadDirectory.replace('\\','/')))
       modelZipFilePath = os.path.join(uploadDirectory, modelZipFileName)
@@ -108,7 +113,7 @@ class Simulate(Resource):
       # load the model in OMC
       fileNames = metaDataJson.get("fileNames", [])
       for fileName in fileNames:
-        if not omc.sendCommand("loadFile(\"{0}\")".format(fileName)):
+        if not omc.sendCommand("loadFile(\"{0}\")".format(fileName), parsed=False):
           resultJson["messages"] = "Failed to load the model file {0}. {1}".format(fileName, omc.errorString)
           resultJson["file"] = ""
           return jsonify(resultJson)
@@ -192,8 +197,10 @@ class Simulate(Resource):
       else:
         resultJson["messages"] = "Class is missing."
         resultJson["file"] = ""
-
-      return jsonify(resultJson)
+    
+    omc.sendCommand("cd(\"{0}\")".format(originalDir.replace('\\','/')))
+    omc.sendCommand("quit()")
+    return jsonify(resultJson)
 
 @api.route("/download/", doc=False)
 class Download(Resource):
@@ -207,7 +214,7 @@ class Download(Resource):
     """Downloads the mat simulation result file."""
     args = self.parser.parse_args()
     fileName = args["FileName"]
-    return flask.send_file(tempfile.gettempdir() + "/" + fileName)
+    return flask.send_file(current_app.config['TMPDIR'] + "/" + fileName)
 
 @api.route("/modelInstance")
 class ModelInstance(Resource):
@@ -227,11 +234,11 @@ class ModelInstance(Resource):
     resultJson = dict()
 
     # clear everything in omc
-    omc.sendCommand("clear()")
+    omc = OMC()
     if modelZipFile and allowedFile(modelZipFile.filename):
       # save the zip file
       modelZipFileName = secure_filename(modelZipFile.filename)
-      uploadDirectory = tempfile.mkdtemp()
+      uploadDirectory = tempfile.mkdtemp(dir=current_app.config['TMPDIR'])
       # change working directory
       omc.sendCommand("cd(\"{0}\")".format(uploadDirectory.replace('\\','/')))
       modelZipFilePath = os.path.join(uploadDirectory, modelZipFileName)
@@ -269,8 +276,8 @@ class ModelInstance(Resource):
           # simulate the model
           className = metaDataJson.get("class", "")
           if className:
-            modelInstanceJson = omc.sendCommand("getModelInstance({0}, {1})".format(className, omc.pythonBoolToModelicaBool(prettyPrint)))
-            fileHandle, modelInstanceJsonFilePath = tempfile.mkstemp(suffix=".json", prefix="modelInstanceJson-")
+            modelInstanceJson = omc.sendCommand("getModelInstance({0}, {1})".format(className, util.pythonBoolToModelicaBool(prettyPrint)))
+            fileHandle, modelInstanceJsonFilePath = tempfile.mkstemp(dir=current_app.config['TMPDIR'], suffix=".json", prefix="modelInstanceJson-")
             try:
               os.write(fileHandle, modelInstanceJson.encode())
             finally:

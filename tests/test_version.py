@@ -28,14 +28,10 @@
 
 # See the full OSMC Public License conditions for more details.
 
-import pytest
-from Service import app
+"""
+Tests the version endpoint.
+"""
 
-@pytest.fixture
-def application():
-  app_ = app.createApp()
-  # always set TESTING to true for tests
-  app_.config.update({
-    "TESTING": True
-  })
-  yield app_
+def test_version(application):
+  response = application.test_client().get("/api/version")
+  assert response.status_code == 200

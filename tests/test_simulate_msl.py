@@ -33,12 +33,18 @@ Tests the simulate endpoint with Modelica.Electrical.Analog.Examples.ChuaCircuit
 """
 
 from pathlib import Path
+import tempfile
+import shutil
 
 # get the resources folder in the tests folder
 resources = Path(__file__).parent / "resources"
 
-def test_simulate(client):
-  response = client.post("/api/simulate", data = {
+def test_simulate(application):
+  application.config.update({
+    "TMPDIR": tempfile.mkdtemp(prefix='test_simulate_msl')
+  })
+
+  response = application.test_client().post("/api/simulate", data = {
     "Zip File": (resources / "MSLSimulation.zip").open("rb")
   })
   assert response.status_code == 200
@@ -47,3 +53,6 @@ def test_simulate(client):
   if not file:
     print(data)
     assert False
+
+  # cleanup
+  shutil.rmtree(application.config['TMPDIR'], ignore_errors=True)

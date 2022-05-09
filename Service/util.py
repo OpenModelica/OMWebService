@@ -28,14 +28,17 @@
 
 # See the full OSMC Public License conditions for more details.
 
-import pytest
-from Service import app
+"""
+OpenModelica kernel module. Communicates with OM compiler.
+"""
 
-@pytest.fixture
-def application():
-  app_ = app.createApp()
-  # always set TESTING to true for tests
-  app_.config.update({
-    "TESTING": True
-  })
-  yield app_
+import logging
+
+log = logging.getLogger(__name__)
+
+def pythonBoolToModelicaBool(value):
+  """Converts the python bool to Modelica."""
+  if value:
+    return "true"
+  else:
+    return "false"

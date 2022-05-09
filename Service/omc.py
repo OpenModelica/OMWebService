@@ -36,27 +36,29 @@ import logging
 from OMPython import OMCSessionZMQ
 
 log = logging.getLogger(__name__)
-omcSession = OMCSessionZMQ()
-errorString = ""
 
-def sendCommand(expression, parsed=True):
-  """Sends the command to OMC."""
-  log.debug("OMC sendCommand: {0} - parsed: {1}".format(expression, parsed))
+class OMC:
+  """OpenModelica Compiler interface"""
 
-  try:
-    res = omcSession.sendExpression(expression, parsed)
-    log.debug("OMC result: {0}".format(res))
-    errorString = omcSession.sendExpression("getErrorString()")
-    log.debug("OMC getErrorString(): {0}".format(errorString))
-  except Exception as ex:
-    log.error("OMC failed: {0}, parsed={1} with exception: {2}".format(expression, parsed, str(ex)))
-    raise
+  def __init__(self):
+    self.omcSession = OMCSessionZMQ()
+    self.errorString = ""
 
-  return res
+  def __del__(self):
+    pass
 
-def pythonBoolToModelicaBool(value):
-  """Converts the python bool to Modelica."""
-  if value:
-    return "true"
-  else:
-    return "false"
+  def sendCommand(self, expression, parsed=True):
+    """Sends the command to OMC."""
+    log.debug("OMC sendCommand: {0} - parsed: {1}".format(expression, parsed))
+
+    try:
+      res = self.omcSession.sendExpression(expression, parsed)
+      log.debug("OMC result: {0}".format(res))
+      if expression != "quit()":
+        errorString = self.omcSession.sendExpression("getErrorString()")
+        log.debug("OMC getErrorString(): {0}".format(errorString))
+    except Exception as ex:
+      log.error("OMC failed: {0}, parsed={1} with exception: {2}".format(expression, parsed, str(ex)))
+      raise
+
+    return res
