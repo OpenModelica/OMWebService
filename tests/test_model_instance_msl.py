@@ -29,7 +29,7 @@
 # See the full OSMC Public License conditions for more details.
 
 """
-Tests the simulate endpoint with BouncingBall file.
+Tests the model instance endpoint with Modelica.Electrical.Analog.Examples.ChuaCircuit model.
 """
 
 from pathlib import Path
@@ -41,12 +41,11 @@ resources = Path(__file__).parent / "resources"
 
 def test_simulate(application):
   application.config.update({
-    "TMPDIR": tempfile.mkdtemp(prefix='test_simulate_with_file')
+    "TMPDIR": tempfile.mkdtemp(prefix='test_model_instance_msl')
   })
 
-  response = application.test_client().post("/api/simulate", data = {
-    "MetadataJson": (resources / "FileSimulation.metadata.json").open("rb"),
-    "ModelZip": (resources / "FileSimulation.zip").open("rb")
+  response = application.test_client().post("/api/modelInstance", data = {
+    "MetadataJson": (resources / "MSLModelInstance.metadata.json").open("rb")
   })
   assert response.status_code == 200
   data = response.json
