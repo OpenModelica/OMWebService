@@ -9,6 +9,8 @@ OpenModelica web service, queries via a REST API
 
 ## Build & Run instructions
 
+Set environment variable `FLASK_ENV=development` for development environment.
+
 ### Option 1
 
 Install the dependencies and then run the following commands,

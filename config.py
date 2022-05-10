@@ -36,15 +36,16 @@ import tempfile
 
 class Config:
   """Base config."""
-  SERVER_NAME = "localhost:8080"
   TMPDIR = tempfile.gettempdir() + "/OMWebService"
 
 class ProductionConfig(Config):
   """Production config."""
+  SERVER_NAME = "omwebservice.openmodelica.org"
   DEBUG = False
   TESTING = False
 
 class DevelopmentConfig(Config):
   """Development config."""
+  SERVER_NAME = "localhost:8080"
   DEBUG = True
   TESTING = True
