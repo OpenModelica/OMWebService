@@ -14,7 +14,8 @@ RUN apt-get update \
   && python3 -m pip install -U . \
   && chmod a+rwx -R /app
 
-ENV DOCKER_APP=yes
+ENV FLASK_ENV=development \
+    DOCKER_APP=yes
 
 ENTRYPOINT [ "python3" ]
 
