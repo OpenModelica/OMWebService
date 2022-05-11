@@ -30,6 +30,10 @@
 
 import pytest
 from Service import app
+import sys
+
+# add Service path so that pytest can find config.py
+sys.path.insert(0,"./Service")
 
 @pytest.fixture
 def application():

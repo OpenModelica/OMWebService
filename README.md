@@ -5,14 +5,13 @@ OpenModelica web service, queries via a REST API
 
 - [Python >= 3.8.5](https://www.python.org/)
 - [Python setuptools](https://pypi.org/project/setuptools/)
-- [OpenModelica >= 1.18.0](https://openmodelica.org)
+- [OpenModelica >= 1.19.0](https://openmodelica.org)
 
 ## Build & Run instructions
 
-Set environment variable `FLASK_ENV=development` for development environment.
-
 ### Option 1
 
+Set environment variable `FLASK_ENV=development` for development environment.
 Install the dependencies and then run the following commands,
 
 ```bash
