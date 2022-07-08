@@ -34,7 +34,6 @@ Api module using the Flask framework.
 
 import os
 import logging
-import string
 import flask
 from flask import current_app, jsonify
 from flask_restx import Resource, Api, reqparse
@@ -244,7 +243,7 @@ class ModelInstance(Resource):
 
   @api.expect(parser)
   def post(self):
-    """Simulate the model."""
+    """Retrieves the model instance."""
     args = self.parser.parse_args()
     metaDataJsonFileArg = args["MetadataJson"]
     modelZipFileArg = args["ModelZip"]
